@@ -37,12 +37,8 @@ public class HarvesterBlock extends BaseEntityBlock {
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof Harvester) {
-                NetworkHooks.openScreen(((ServerPlayer)pPlayer), (MenuProvider)entity, pPos);
-            }
-            else {
-                throw new IllegalStateException("Our Container provider is missing!");
-            }
+            if(entity instanceof Harvester) { NetworkHooks.openScreen(((ServerPlayer)pPlayer), (MenuProvider)entity, pPos); }
+            else { throw new IllegalStateException("Our Container provider is missing!"); }
         }
 
         return InteractionResult.sidedSuccess(pLevel.isClientSide());

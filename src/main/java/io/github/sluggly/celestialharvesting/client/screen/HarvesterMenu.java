@@ -64,10 +64,7 @@ public class HarvesterMenu extends AbstractContainerMenu {
         throw new IllegalStateException("Illegal BlockEntity class at position!" + data.readBlockPos());
     }
 
-    // This allows your screen to access the synced health value
     public int getHealth() { return this.data.get(0); }
-
-    // This allows your screen to access the synced max health value
     public int getMaxHealth() { return this.data.get(1); }
 
 
