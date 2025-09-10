@@ -1,3 +1,5 @@
 {
-  "itemGroup.celestial_harvesting_tab": "Celestial Harvesting"
+  "itemGroup.celestial_harvesting_tab": "Celestial Harvesting",
+
+  "block.celestialharvesting.harvester": "Harvester"
 }
