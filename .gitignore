@@ -1,0 +1,57 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+.gradle/
+build/
+run/
+runs/
+out/
+
+# other
+eclipse
+run
+
+# User-specific
+/user_jvm_args.txt
+.DS_Store
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# Logs and Crash Reports
+logs/
+crash-reports/
+
+# Eclipse
+.metadata/
+.project
+bin/
+tmp/
+*.tmp
+*.class
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+#vscode
+.vscode/
+
+#Other
+AutreFichiers/
