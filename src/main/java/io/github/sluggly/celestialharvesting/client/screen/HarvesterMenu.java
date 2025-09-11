@@ -90,9 +90,6 @@ public class HarvesterMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(@NotNull Player pPlayer, int pButtonId) {
         switch (pButtonId) {
-            case 0:
-                System.out.println("Server: Start Mission button clicked!");
-                return true;
             case 1:
                 System.out.println("Server: Upgrades button clicked!");
                 return true;

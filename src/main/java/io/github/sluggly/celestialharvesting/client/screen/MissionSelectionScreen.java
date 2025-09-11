@@ -1,0 +1,154 @@
+package io.github.sluggly.celestialharvesting.client.screen;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.sluggly.celestialharvesting.CelestialHarvesting;
+import io.github.sluggly.celestialharvesting.harvester.Harvester;
+import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
+import io.github.sluggly.celestialharvesting.mission.Mission;
+import io.github.sluggly.celestialharvesting.mission.MissionManager;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MissionSelectionScreen extends Screen {
+    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/space_background.png");
+
+    private final Harvester harvester;
+    private final HarvesterData harvesterData;
+
+    private static final int PLANET_TEXTURE_WIDTH = 64;
+    private static final int PLANET_TEXTURE_HEIGHT = 64;
+    private static final int SAFE_ZONE_PADDING = 10;
+    private List<MissionDisplayInfo> missionDisplayInfos;
+    private record MissionDisplayInfo(Mission mission, int x, int y) {}
+
+    public MissionSelectionScreen(Harvester harvester) {
+        super(Component.literal("Mission Selection"));
+        this.harvester = harvester;
+        this.harvesterData = harvester.getHarvesterData();
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        this.calculateMissionPositions();
+        this.clearWidgets();
+
+        if (this.missionDisplayInfos != null) {
+            for (MissionDisplayInfo info : this.missionDisplayInfos) {
+                // Use our new PlanetButton
+                addRenderableWidget(new PlanetButton(info.x(), info.y(), PLANET_TEXTURE_WIDTH, PLANET_TEXTURE_HEIGHT, info.mission(),
+                        (button) -> {
+                            // Handle mission selection later
+                            System.out.println("Selected mission: " + info.mission().getName());
+                            // Example: this.minecraft.setScreen(null); // Close the screen
+                        }));
+            }
+        }
+    }
+
+    @Override
+    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(pGuiGraphics);
+
+        // The buttons now render themselves, so we don't need to draw the textures here.
+        // We only need to call the super method to render all the widgets we added.
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+
+        // Keep the tooltip logic, as it's separate from the buttons
+        if (this.missionDisplayInfos != null) {
+            for (MissionDisplayInfo info : this.missionDisplayInfos) {
+                if (pMouseX >= info.x() && pMouseX <= info.x() + PLANET_TEXTURE_WIDTH &&
+                        pMouseY >= info.y() && pMouseY <= info.y() + PLANET_TEXTURE_HEIGHT) {
+                    pGuiGraphics.renderTooltip(this.font, Component.literal(info.mission().getName()), pMouseX, pMouseY);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void renderBackground(@NotNull GuiGraphics pGuiGraphics) {
+        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
+        int textureSize = 256;
+        int screenWidth = this.width;
+        int screenHeight = this.height;
+
+        for (int x = 0; x < screenWidth; x += textureSize) {
+            for (int y = 0; y < screenHeight; y += textureSize) {
+                pGuiGraphics.blit(BACKGROUND_TEXTURE, x, y, 0, 0, Math.min(textureSize, screenWidth - x), Math.min(textureSize, screenHeight - y));
+            }
+        }
+    }
+
+    @Override
+    public boolean isPauseScreen() { return false; }
+
+    private void calculateMissionPositions() {
+
+        List<Mission> missionsToDisplay = MissionManager.getInstance().getAllMissions().entrySet().stream()
+                .map(entry -> new Mission(entry.getKey(), entry.getValue()))
+                .toList();
+
+        if (missionsToDisplay.isEmpty()) {
+            this.missionDisplayInfos = new ArrayList<>();
+            return;
+        }
+
+        // Use the harvester's seed for deterministic "random" placement
+        Random random = new Random(this.harvesterData.getSeed());
+
+        // --- Core Layout Logic ---
+        int missionCount = missionsToDisplay.size();
+
+        // 1. Determine the best grid dimensions (rows x columns)
+        int cols = (int) Math.ceil(Math.sqrt(missionCount));
+        int rows = (int) Math.ceil((double) missionCount / cols);
+
+        // Adjust for screen aspect ratio to make cells more square-like
+        if (this.width > this.height) {
+            cols = Math.max(rows, cols);
+            rows = (int) Math.ceil((double) missionCount / cols);
+        }
+        else {
+            rows = Math.max(rows, cols);
+            cols = (int) Math.ceil((double) missionCount / rows);
+        }
+
+        // 2. Calculate the size of each grid cell
+        int cellWidth = (this.width - 2 * SAFE_ZONE_PADDING) / cols;
+        int cellHeight = (this.height - 2 * SAFE_ZONE_PADDING) / rows;
+
+        this.missionDisplayInfos = new ArrayList<>();
+        for (int i = 0; i < missionCount; i++) {
+            Mission mission = missionsToDisplay.get(i);
+
+            int gridRow = i / cols;
+            int gridCol = i % cols;
+
+            // 3. Find the top-left corner of the cell
+            int cellX = SAFE_ZONE_PADDING + gridCol * cellWidth;
+            int cellY = SAFE_ZONE_PADDING + gridRow * cellHeight;
+
+            // 4. Calculate the random "jitter" within the cell
+            // We ensure the planet texture stays fully inside its cell
+            int xJitterRange = cellWidth - PLANET_TEXTURE_WIDTH;
+            int yJitterRange = cellHeight - PLANET_TEXTURE_HEIGHT;
+
+            // Ensure range is not negative if the screen is too small
+            int xJitter = (xJitterRange > 0) ? random.nextInt(xJitterRange) : 0;
+            int yJitter = (yJitterRange > 0) ? random.nextInt(yJitterRange) : 0;
+
+            int finalX = cellX + xJitter;
+            int finalY = cellY + yJitter;
+
+            this.missionDisplayInfos.add(new MissionDisplayInfo(mission, finalX, finalY));
+        }
+    }
+}

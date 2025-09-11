@@ -25,14 +25,12 @@ public class MainScreen extends AbstractContainerScreen<HarvesterMenu> {
     @Override
     protected void init() {
         super.init();
-        // This is where you create your buttons
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
 
+        assert minecraft != null;
         // Add the buttons. The onPress action sends a packet to the server via clickMenuButton.
-        addRenderableWidget(Button.builder(Component.literal("Start Mission"),
-                        (button) -> this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 0))
-                .bounds(x + 8, y + 20, 80, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Start Mission"), (button) -> this.minecraft.setScreen(new MissionSelectionScreen(this.menu.blockEntity))).bounds(x + 8, y + 20, 80, 20).build());
 
         addRenderableWidget(Button.builder(Component.literal("Upgrades"),
                         (button) -> this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 1))
