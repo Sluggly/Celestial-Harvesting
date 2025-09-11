@@ -1,6 +1,7 @@
 package io.github.sluggly.celestialharvesting.events;
 
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
+import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryScreen;
 import io.github.sluggly.celestialharvesting.client.screen.MainScreen;
 import io.github.sluggly.celestialharvesting.init.MenuInit;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -13,6 +14,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 public class ClientModEvents {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        MenuScreens.register(MenuInit.HARVESTER_MENU.get(), MainScreen::new);
+        //MenuScreens.register(MenuInit.HARVESTER_MENU.get(), MainScreen::new);
+        MenuScreens.register(MenuInit.HARVESTER_INVENTORY_MENU.get(), HarvesterInventoryScreen::new);
     }
 }

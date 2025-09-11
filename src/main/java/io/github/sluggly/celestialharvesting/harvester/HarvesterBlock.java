@@ -1,7 +1,10 @@
 package io.github.sluggly.celestialharvesting.harvester;
 
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
+import io.github.sluggly.celestialharvesting.network.PacketHandler;
+import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -37,8 +40,11 @@ public class HarvesterBlock extends BaseEntityBlock {
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof Harvester) { NetworkHooks.openScreen(((ServerPlayer)pPlayer), (MenuProvider)entity, pPos); }
-            else { throw new IllegalStateException("Our Container provider is missing!"); }
+            if (entity instanceof Harvester) {
+                CompoundTag data = new CompoundTag();
+                data.putLong(NBTKeys.BLOCK_POS, pPos.asLong());
+                PacketHandler.sendToPlayer(NBTKeys.ACTION_OPEN_HARVESTER_SCREEN, data, (ServerPlayer) pPlayer);
+            } else { throw new IllegalStateException("Our Harvester block entity is missing!"); }
         }
 
         return InteractionResult.sidedSuccess(pLevel.isClientSide());

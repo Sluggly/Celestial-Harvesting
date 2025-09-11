@@ -24,10 +24,7 @@ public class PlanetButton extends Button {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        if (this.active) {
-            pGuiGraphics.renderOutline(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFA500); // Orange
-        }
-        else if (this.isHoveredOrFocused()) {
+        if (this.isHoveredOrFocused()) {
             pGuiGraphics.renderOutline(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFFF00); // Yellow
         }
         pGuiGraphics.blit(this.icon, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
