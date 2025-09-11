@@ -1,0 +1,17 @@
+{
+  "name": "Test Planet",
+  "icon": "test_icon",
+  "travel": 120,
+  "fuel": 50,
+  "damage": 10,
+  "rewards": [
+    {
+      "count": 16,
+      "item": "minecraft:diamond"
+    },
+    {
+      "count": 32,
+      "item": "minecraft:iron_ingot"
+    }
+  ]
+}
