@@ -12,6 +12,7 @@ public class NBTKeys {
     public static final String HARVESTER_TIER = "Tier";
     public static final String HARVESTER_MISSION_TIME_LEFT = "TimeLeft";
     public static final String HARVESTER_ACTIVE_MISSION_ID = "MissionId";
+    public static final String HARVESTER_UPGRADES = "Upgrades";
 
     // Packet Action
     public static final String ACTION_OPEN_HARVESTER_SCREEN = "OpenHarvesterScreen";
@@ -20,6 +21,10 @@ public class NBTKeys {
     public static final String ACTION_REPAIR_HARVESTER = "RepairHarvester";
     public static final String ACTION_OPEN_HARVESTER_INVENTORY = "OpenHarvesterInventory";
     public static final String ACTION_START_MISSION = "StartMission";
+    public static final String ACTION_SYNC_UPGRADES = "SyncUpgrades";
+
+    // Upgrades
+    public static final String UPGRADES_DATA = "UpgradesData";
 
     // Mission
     public static final String MISSIONS_DATA = "MissionsData";

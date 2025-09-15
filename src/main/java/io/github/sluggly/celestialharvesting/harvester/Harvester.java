@@ -1,5 +1,6 @@
 package io.github.sluggly.celestialharvesting.harvester;
 
+import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
 import io.github.sluggly.celestialharvesting.mission.Mission;
@@ -46,6 +47,9 @@ public class Harvester extends BlockEntity implements MenuProvider {
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     public ItemStackHandler getItemHandler() { return this.itemHandler; }
 
+    private static final ResourceLocation SOLAR_PANEL_UPGRADE = new ResourceLocation(CelestialHarvesting.MOD_ID, "integrated_solar_panel");
+    private static final int SOLAR_GENERATION_RATE = 10;
+
     private final EnergyStorage energyStorage = new EnergyStorage(20000, 512, 0) {
         @Override
         public int receiveEnergy(int maxReceive, boolean simulate) {
@@ -83,6 +87,19 @@ public class Harvester extends BlockEntity implements MenuProvider {
             if (timeLeft <= 0) { pBlockEntity.completeMission(); }
             else {
                 if (timeLeft % 20 == 0) { pBlockEntity.setChanged(); }
+            }
+        }
+        else {
+            if (pBlockEntity.getHarvesterData().hasUpgrade(SOLAR_PANEL_UPGRADE)) {
+                // Only generate power if idle (don't generate during missions) and not full
+                if (pBlockEntity.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_STATUS_IDLE) &&
+                        pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
+
+                    // Check for daytime and sky access
+                    if (pLevel.isDay() && pLevel.canSeeSky(pPos.above())) {
+                        pBlockEntity.energyStorage.receiveEnergy(SOLAR_GENERATION_RATE, false);
+                    }
+                }
             }
         }
     }

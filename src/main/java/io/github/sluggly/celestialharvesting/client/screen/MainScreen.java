@@ -48,7 +48,9 @@ public class MainScreen extends Screen {
             PacketHandler.sendToServer(new CtoSPacket(NBTKeys.ACTION_OPEN_HARVESTER_INVENTORY, data));
         }).bounds(buttonX, buttonY - 40, 80, 20).build());
 
-        addRenderableWidget(Button.builder(Component.literal("Upgrades"), (button) -> {System.out.println("Client: Upgrades button clicked!");}).bounds(buttonX, buttonY - 20, 80, 20).build());
+        addRenderableWidget(Button.builder(Component.literal("Upgrades"),
+                        (button) -> this.minecraft.setScreen(new UpgradeScreen(this.harvester, this)))
+                .bounds(buttonX, buttonY - 20, 80, 20).build());
 
         this.repairButton = addRenderableWidget(Button.builder(Component.literal("Repair"),
                         (button) -> {

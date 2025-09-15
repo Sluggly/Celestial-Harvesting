@@ -2,8 +2,14 @@ package io.github.sluggly.celestialharvesting.harvester;
 
 import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import static io.github.sluggly.celestialharvesting.utils.NBTKeys.*;
 
@@ -20,6 +26,7 @@ public class HarvesterData {
             this.dataTag.putString(HARVESTER_STATUS,HARVESTER_IDLE);
             this.dataTag.putInt(HARVESTER_MISSION_TIME_LEFT, 0);
             this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, "");
+            this.dataTag.put(HARVESTER_UPGRADES, new ListTag());
         }
         else { this.dataTag = tag; }
     }
@@ -51,5 +58,23 @@ public class HarvesterData {
 
     public String getActiveMissionID() { return this.dataTag.getString(HARVESTER_ACTIVE_MISSION_ID); }
     public void setActiveMissionID(String id) { this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, id); }
+
+    public boolean hasUpgrade(ResourceLocation id) {
+        ListTag upgrades = this.dataTag.getList(HARVESTER_UPGRADES, Tag.TAG_STRING);
+        return upgrades.contains(StringTag.valueOf(id.toString()));
+    }
+
+    public void addUpgrade(ResourceLocation id) {
+        if (!hasUpgrade(id)) {
+            this.dataTag.getList(HARVESTER_UPGRADES, Tag.TAG_STRING).add(StringTag.valueOf(id.toString()));
+        }
+    }
+
+    public Set<ResourceLocation> getUnlockedUpgrades() {
+        Set<ResourceLocation> unlocked = new HashSet<>();
+        ListTag upgrades = this.dataTag.getList(HARVESTER_UPGRADES, Tag.TAG_STRING);
+        for (Tag tag : upgrades) { unlocked.add(new ResourceLocation(tag.getAsString())); }
+        return unlocked;
+    }
 
 }

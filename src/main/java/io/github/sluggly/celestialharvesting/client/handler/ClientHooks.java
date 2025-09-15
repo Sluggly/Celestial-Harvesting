@@ -6,6 +6,7 @@ import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.mission.MissionDefinition;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.network.StoCPacket;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,8 @@ public class ClientHooks {
         switch (action) {
             case NBTKeys.ACTION_REFRESH_DATA -> updateNBTData(msg);
             case NBTKeys.ACTION_OPEN_HARVESTER_SCREEN -> openHarvesterScreen(msg);
-            case NBTKeys.ACTION_SYNC_MISSIONS -> handleMissionSync(msg);
+            case NBTKeys.ACTION_SYNC_MISSIONS -> MissionManager.handleMissionSync(msg);
+            case NBTKeys.ACTION_SYNC_UPGRADES -> UpgradeManager.handleUpgradeSync(msg);
             // ADMIN CASES
             //case "LogData" -> ArenaData.logCustomDataClient();
             case "Admin" -> Admin.CLIENT_IS_ADMIN_MODE_ACTIVATED = true;
@@ -33,27 +35,6 @@ public class ClientHooks {
             case "AdminLog" -> Admin.ADMIN_SERVER_CONSOLE_LOG = true;
             case "AdminLogNo" -> Admin.ADMIN_SERVER_CONSOLE_LOG = false;
         }
-    }
-
-    private static void handleMissionSync(StoCPacket msg) {
-        CompoundTag data = msg.data;
-        if (data == null || !data.contains(NBTKeys.MISSIONS_DATA)) {
-            System.err.println("Received mission sync packet with no data!");
-            return;
-        }
-
-        CompoundTag missionsTag = data.getCompound(NBTKeys.MISSIONS_DATA);
-        Map<ResourceLocation, MissionDefinition> syncedMissions = new HashMap<>();
-
-        for (String key : missionsTag.getAllKeys()) {
-            ResourceLocation location = new ResourceLocation(key);
-            Tag missionTag = missionsTag.get(key);
-
-            MissionDefinition.CODEC.parse(NbtOps.INSTANCE, missionTag)
-                    .resultOrPartial(error -> System.err.println("Failed to decode mission " + location + ": " + error))
-                    .ifPresent(definition -> syncedMissions.put(location, definition));
-        }
-        MissionManager.getInstance().setMissions(syncedMissions);
     }
 
     private static void openHarvesterScreen(StoCPacket msg) {
