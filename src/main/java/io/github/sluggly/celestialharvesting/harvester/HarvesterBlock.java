@@ -5,6 +5,7 @@ import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -40,7 +41,11 @@ public class HarvesterBlock extends BaseEntityBlock {
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if (entity instanceof Harvester) {
+            if (entity instanceof Harvester harvester) {
+                if (harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_ONGOING)) {
+                    pPlayer.sendSystemMessage(Component.literal("Harvester is currently on a mission."));
+                    return InteractionResult.SUCCESS;
+                }
                 CompoundTag data = new CompoundTag();
                 data.putLong(NBTKeys.BLOCK_POS, pPos.asLong());
                 PacketHandler.sendToPlayer(NBTKeys.ACTION_OPEN_HARVESTER_SCREEN, data, (ServerPlayer) pPlayer);

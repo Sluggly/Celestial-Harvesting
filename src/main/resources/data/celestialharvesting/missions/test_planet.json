@@ -1,8 +1,8 @@
 {
   "name": "Test Planet",
   "icon": "test_icon",
-  "travel": 120,
-  "fuel": 50,
+  "travel": 3,
+  "fuel": 0,
   "damage": 10,
   "rewards": [
     {

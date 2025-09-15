@@ -17,7 +17,9 @@ public class HarvesterData {
             this.dataTag.putInt(HARVESTER_MAX_HEALTH, 100);
             this.dataTag.putInt(HARVESTER_SEED, Utils.generateSeed());
             this.dataTag.putInt(HARVESTER_TIER,1);
-            this.dataTag.putString(HARVESTER_STATE,HARVESTER_IDLE);
+            this.dataTag.putString(HARVESTER_STATUS,HARVESTER_IDLE);
+            this.dataTag.putInt(HARVESTER_MISSION_TIME_LEFT, 0);
+            this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, "");
         }
         else { this.dataTag = tag; }
     }
@@ -28,8 +30,8 @@ public class HarvesterData {
     public void setMaxHealth(int health) { this.dataTag.putInt(HARVESTER_MAX_HEALTH, health); }
     public int getSeed() { return this.dataTag.getInt(HARVESTER_SEED); }
     public void generateSeed() { this.dataTag.putInt(HARVESTER_SEED, Utils.generateSeed()); }
-    public String getState() { return this.dataTag.getString(HARVESTER_STATE); }
-    public void setState(String state) { this.dataTag.putString(HARVESTER_STATE,state); }
+    public String getState() { return this.dataTag.getString(HARVESTER_STATUS); }
+    public void setState(String state) { this.dataTag.putString(HARVESTER_STATUS,state); }
 
     public int getNumberOfMissions(int seed) {
         int minimum = 1;
@@ -40,5 +42,14 @@ public class HarvesterData {
     }
     public int getTier() { return this.dataTag.getInt(HARVESTER_TIER); }
     public void setTier(int tier) { this.dataTag.putInt(HARVESTER_TIER, tier); }
+
+    public String getStatus() { return this.dataTag.getString(HARVESTER_STATUS); }
+    public void setStatus(String status) { this.dataTag.putString(HARVESTER_STATUS, status); }
+
+    public int getMissionTimeLeft() { return this.dataTag.getInt(HARVESTER_MISSION_TIME_LEFT); }
+    public void setMissionTimeLeft(int ticks) { this.dataTag.putInt(HARVESTER_MISSION_TIME_LEFT, ticks); }
+
+    public String getActiveMissionID() { return this.dataTag.getString(HARVESTER_ACTIVE_MISSION_ID); }
+    public void setActiveMissionID(String id) { this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, id); }
 
 }

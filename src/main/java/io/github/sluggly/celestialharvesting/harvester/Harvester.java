@@ -2,10 +2,18 @@ package io.github.sluggly.celestialharvesting.harvester;
 
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
+import io.github.sluggly.celestialharvesting.mission.Mission;
+import io.github.sluggly.celestialharvesting.mission.MissionItem;
+import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -17,22 +25,39 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Harvester extends BlockEntity implements MenuProvider {
-    private static final int INVENTORY_SIZE = 54;
     private HarvesterData harvesterData = new HarvesterData(null);
+    private static final int INVENTORY_SIZE = 54;
+    private boolean isInternalModification = false;
     private final ItemStackHandler itemHandler = new ItemStackHandler(INVENTORY_SIZE) {
         @Override
         protected void onContentsChanged(int slot) { setChanged(); }
         @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) { return false; }
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) { return isInternalModification; }
     };
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     public ItemStackHandler getItemHandler() { return this.itemHandler; }
+
+    private final EnergyStorage energyStorage = new EnergyStorage(20000, 512, 0) {
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            int received = super.receiveEnergy(maxReceive, simulate);
+            if (received > 0 && !simulate) {
+                setChanged();
+                if(level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
+            }
+            return received;
+        }
+    };
+    private LazyOptional<IEnergyStorage> lazyEnergyHandler = LazyOptional.empty();
 
     public Harvester(BlockPos pPos, BlockState pBlockState) { super(BlockEntityInit.HARVESTER.get(), pPos, pBlockState); }
 
@@ -48,27 +73,23 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public HarvesterData getHarvesterData() { return harvesterData; }
 
     public static void tick(Level pLevel, BlockPos pPos, BlockState pState, Harvester pBlockEntity) {
-        // All core logic (like counting down a timer) should ONLY run on the server side.
-        if (pLevel.isClientSide()) {
-            // Client-side logic here (e.g., handling animations, spawning particles)
-        } else {
-            // Server-side logic here (e.g., checking if a mission is active, counting down the timer,
-            // completing the mission and adding resources, etc.)
+        if (pLevel.isClientSide()) { return; }
 
-            // Example:
-            // if (pBlockEntity.harvesterData.isMissionActive()) {
-            //     pBlockEntity.harvesterData.tickDownTimer();
-            //     if (pBlockEntity.harvesterData.isMissionComplete()) {
-            //         pBlockEntity.completeMission();
-            //         // Mark the block entity as dirty to ensure its new state is saved.
-            //         setChanged(pLevel, pPos, pState);
-            //     }
-            // }
+        if (pBlockEntity.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_ONGOING)) {
+            int timeLeft = pBlockEntity.getHarvesterData().getMissionTimeLeft();
+            timeLeft--;
+            pBlockEntity.getHarvesterData().setMissionTimeLeft(timeLeft);
+
+            if (timeLeft <= 0) { pBlockEntity.completeMission(); }
+            else {
+                if (timeLeft % 20 == 0) { pBlockEntity.setChanged(); }
+            }
         }
     }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (cap == ForgeCapabilities.ENERGY) { return lazyEnergyHandler.cast(); }
         if (cap == ForgeCapabilities.ITEM_HANDLER) { return lazyItemHandler.cast(); }
         return super.getCapability(cap, side);
     }
@@ -77,18 +98,21 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public void onLoad() {
         super.onLoad();
         lazyItemHandler = LazyOptional.of(() -> itemHandler);
+        lazyEnergyHandler = LazyOptional.of(() -> energyStorage);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyItemHandler.invalidate();
+        lazyEnergyHandler.invalidate();
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         pTag.put("HarvesterData", harvesterData.dataTag);
-        pTag.put("inventory", itemHandler.serializeNBT()); // Save the inventory
+        pTag.put("inventory", itemHandler.serializeNBT());
+        pTag.put("energy", energyStorage.serializeNBT());
         super.saveAdditional(pTag);
     }
 
@@ -97,6 +121,54 @@ public class Harvester extends BlockEntity implements MenuProvider {
         super.load(pTag);
         if (pTag.contains("HarvesterData")) { harvesterData = new HarvesterData(pTag.getCompound("HarvesterData")); }
         if (pTag.contains("inventory")) { itemHandler.deserializeNBT(pTag.getCompound("inventory")); }
+        if (pTag.contains("energy", Tag.TAG_INT)) { energyStorage.deserializeNBT(pTag.get("energy")); }
     }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag() { return saveWithoutMetadata(); }
+    public int getEnergyStored() { return this.energyStorage.getEnergyStored(); }
+    public int getMaxEnergyStored() { return this.energyStorage.getMaxEnergyStored(); }
+    public void consumeEnergy(int amount) {
+        this.energyStorage.extractEnergy(amount, false);
+        setChanged();
+        if(level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
+    }
+
+    public void completeMission() {
+        String missionIdStr = this.harvesterData.getActiveMissionID();
+        if (missionIdStr.isEmpty()) return;
+
+        Mission mission = Mission.getMissionFromId(new ResourceLocation(missionIdStr));
+        if (mission == null) return;
+
+        int currentHealth = this.harvesterData.getCurrentHealth();
+        this.harvesterData.setCurrentHealth(currentHealth - mission.getDamage());
+
+        if (this.harvesterData.getCurrentHealth() <= 0) {
+            for (int i = 0; i < this.itemHandler.getSlots(); i++) { this.itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
+        }
+        else {
+            try {
+                this.isInternalModification = true;
+                for (MissionItem reward : mission.getRewards()) {
+                    ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.toItemStack(), false);
+                }
+            }
+            finally {
+                this.isInternalModification = false;
+            }
+        }
+
+        this.harvesterData.setStatus(NBTKeys.HARVESTER_IDLE);
+        this.harvesterData.setActiveMissionID("");
+        this.harvesterData.setMissionTimeLeft(0);
+
+        setChanged();
+        if (level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
+    }
+
 
 }

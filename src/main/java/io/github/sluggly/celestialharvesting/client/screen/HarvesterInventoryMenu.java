@@ -80,11 +80,8 @@ public class HarvesterInventoryMenu extends AbstractContainerMenu {
         }
         else { return ItemStack.EMPTY; }
 
-        if (sourceStack.getCount() == 0) {
-            sourceSlot.set(ItemStack.EMPTY);
-        } else {
-            sourceSlot.setChanged();
-        }
+        if (sourceStack.getCount() == 0) { sourceSlot.set(ItemStack.EMPTY); }
+        else { sourceSlot.setChanged(); }
         sourceSlot.onTake(pPlayer, sourceStack);
         return copyStack;
     }

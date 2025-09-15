@@ -64,6 +64,7 @@ public class MainScreen extends Screen {
         this.renderBackground(pGuiGraphics);
         renderGui(pGuiGraphics);
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        renderTooltips(pGuiGraphics, pMouseX, pMouseY);
     }
 
     private void renderGui(GuiGraphics pGuiGraphics) {
@@ -74,12 +75,39 @@ public class MainScreen extends Screen {
         RenderSystem.setShaderTexture(0, TEXTURE);
         pGuiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
 
+        renderEnergyBar(pGuiGraphics);
+
         Component title = Component.literal("Harvester Tier " + this.harvester.getHarvesterData().getTier());
         pGuiGraphics.drawCenteredString(this.font, title, this.width / 2, this.topPos + 8, 0xFFFFFF);
 
         int percentage = (int) (((float) currentHealth / maxHealth) * 100);
         Component hullText = Component.literal("Hull: " + percentage + "%");
         pGuiGraphics.drawString(this.font, hullText, this.leftPos + 145, this.topPos + this.imageHeight - 22, 0xFFFFFF, true);
+    }
+
+    private void renderEnergyBar(GuiGraphics pGuiGraphics) {
+        int energy = this.harvester.getEnergyStored();
+        int maxEnergy = this.harvester.getMaxEnergyStored();
+
+        if (maxEnergy > 0) {
+            int barWidth = 13;
+            int barHeight = 60;
+            int scaledEnergy = (int)(((float)energy / maxEnergy) * barHeight);
+
+            int energyBarX = this.leftPos + this.imageWidth - 28;
+            int energyBarY = this.topPos + 20;
+            pGuiGraphics.fill(energyBarX, energyBarY, energyBarX + barWidth, energyBarY + barHeight, 0xFF303030);
+            pGuiGraphics.fill(energyBarX, energyBarY + (barHeight - scaledEnergy), energyBarX + barWidth, energyBarY + barHeight, 0xFFFF0000);
+        }
+    }
+
+    private void renderTooltips(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY) {
+        int energyBarX = this.leftPos + this.imageWidth - 28;
+        int energyBarY = this.topPos + 20;
+        if (pMouseX >= energyBarX && pMouseX < energyBarX + 13 && pMouseY >= energyBarY && pMouseY < energyBarY + 60) {
+            Component text = Component.literal(this.harvester.getEnergyStored() + " / " + this.harvester.getMaxEnergyStored() + " FE");
+            pGuiGraphics.renderTooltip(this.font, text, pMouseX, pMouseY);
+        }
     }
 
     @Override

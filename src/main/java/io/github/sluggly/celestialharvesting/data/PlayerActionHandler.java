@@ -3,11 +3,13 @@ package io.github.sluggly.celestialharvesting.data;
 import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryMenu;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
+import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
 import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,6 +46,28 @@ public class PlayerActionHandler {
                                 (id, inv, p) -> new HarvesterInventoryMenu(id, inv, harvester),
                                 harvester.getDisplayName()
                         ), pos);
+                    }
+                }
+            }
+            case NBTKeys.ACTION_START_MISSION -> {
+                if (data.contains(NBTKeys.BLOCK_POS) && data.contains(NBTKeys.HARVESTER_ACTIVE_MISSION_ID)) {
+                    BlockPos pos = BlockPos.of(data.getLong(NBTKeys.BLOCK_POS));
+                    ResourceLocation missionId = new ResourceLocation(data.getString(NBTKeys.HARVESTER_ACTIVE_MISSION_ID));
+
+                    BlockEntity be = player.level().getBlockEntity(pos);
+                    if (be instanceof Harvester harvester) {
+                        Mission mission = Mission.getMissionFromId(missionId);
+                        if (mission == null) return;
+
+                        if (harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && harvester.getEnergyStored() >= mission.getFuelCost()) {
+                            harvester.consumeEnergy(mission.getFuelCost());
+                            harvester.getHarvesterData().setStatus(NBTKeys.HARVESTER_ONGOING);
+                            harvester.getHarvesterData().setActiveMissionID(missionId.toString());
+                            harvester.getHarvesterData().setMissionTimeLeft(mission.getTravelTime() * 20);
+
+                            harvester.setChanged();
+                            player.level().sendBlockUpdated(pos, harvester.getBlockState(), harvester.getBlockState(), 3);
+                        }
                     }
                 }
             }

@@ -6,9 +6,12 @@ import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
+import io.github.sluggly.celestialharvesting.network.CtoSPacket;
+import io.github.sluggly.celestialharvesting.network.PacketHandler;
+import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -46,23 +49,26 @@ public class MissionSelectionScreen extends Screen {
                 // Use our new PlanetButton
                 addRenderableWidget(new PlanetButton(info.x(), info.y(), PLANET_TEXTURE_WIDTH, PLANET_TEXTURE_HEIGHT, info.mission(),
                         (button) -> {
-                            // Handle mission selection later
-                            System.out.println("Selected mission: " + info.mission().getName());
-                            // Example: this.minecraft.setScreen(null); // Close the screen
+                            if (this.harvester.getEnergyStored() >= info.mission().getFuelCost()) {
+                                CompoundTag data = new CompoundTag();
+                                data.putLong(NBTKeys.BLOCK_POS, this.harvester.getBlockPos().asLong());
+                                data.putString(NBTKeys.HARVESTER_ACTIVE_MISSION_ID, info.mission().getId().toString());
+                                PacketHandler.sendToServer(new CtoSPacket(NBTKeys.ACTION_START_MISSION, data));
+                                assert this.minecraft != null;
+                                this.minecraft.setScreen(null);
+                            }
+                            else {
+                                System.out.println("Not enough energy!");
+                            }
                         }));
             }
         }
     }
 
     @Override
-    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+    public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(pGuiGraphics);
-
-        // The buttons now render themselves, so we don't need to draw the textures here.
-        // We only need to call the super method to render all the widgets we added.
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-
-        // Keep the tooltip logic, as it's separate from the buttons
         if (this.missionDisplayInfos != null) {
             for (MissionDisplayInfo info : this.missionDisplayInfos) {
                 if (pMouseX >= info.x() && pMouseX <= info.x() + PLANET_TEXTURE_WIDTH &&
