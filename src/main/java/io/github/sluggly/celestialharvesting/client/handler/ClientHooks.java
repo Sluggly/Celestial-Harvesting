@@ -2,6 +2,7 @@ package io.github.sluggly.celestialharvesting.client.handler;
 
 import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.MainScreen;
+import io.github.sluggly.celestialharvesting.client.screen.UpgradeScreen;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.mission.MissionDefinition;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
@@ -61,6 +62,9 @@ public class ClientHooks {
             BlockEntity be = mc.level.getBlockEntity(pos);
             if (be instanceof Harvester harvester) {
                 harvester.load(data);
+                if (mc.screen instanceof UpgradeScreen upgradeScreen) {
+                    if (upgradeScreen.isForHarvester(harvester)) { upgradeScreen.refreshData(); }
+                }
             }
         }
     }

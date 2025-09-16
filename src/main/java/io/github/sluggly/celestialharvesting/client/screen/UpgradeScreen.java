@@ -9,7 +9,6 @@ import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class UpgradeScreen extends Screen {
     private static final ResourceLocation TEXTURE = new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/harvester_gui.png");
-    private static final ResourceLocation WIDGETS_TEXTURE = new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/widgets.png");
 
     private final Harvester harvester;
     private final Screen lastScreen;
@@ -40,6 +38,9 @@ public class UpgradeScreen extends Screen {
         super.init();
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
+
+        super.init();
+
         this.upgradeData = new UpgradeData(this.harvester);
 
         // Back Button
@@ -62,7 +63,6 @@ public class UpgradeScreen extends Screen {
             });
 
             button.active = info.canUnlock;
-            button.setTooltip(Tooltip.create(info.tooltip));
             addRenderableWidget(button);
         }
     }
@@ -75,6 +75,16 @@ public class UpgradeScreen extends Screen {
         renderUpgradeGrid(pGuiGraphics);
 
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick); // Renders buttons and their tooltips
+
+        for (var widget : this.renderables) {
+            if (widget instanceof UpgradeButton button && button.isHoveredOrFocused()) {
+                UpgradeData.UpgradeDisplayInfo info = this.upgradeData.upgradeInfoMap.get(button.upgradeId);
+                if (info != null) {
+                    renderUpgradeTooltip(pGuiGraphics, info, pMouseX, pMouseY);
+                    break;
+                }
+            }
+        }
 
         pGuiGraphics.drawCenteredString(this.font, this.title, this.width / 2, this.topPos + 10, 0xFFFFFF);
     }
@@ -93,18 +103,23 @@ public class UpgradeScreen extends Screen {
             }
         }
 
-        // Render icons and backgrounds
         for (UpgradeData.UpgradeDisplayInfo info : this.upgradeData.upgradeInfoMap.values()) {
-            int x = this.leftPos + 17 + (info.def.column() * 24);
-            int y = this.topPos + 37 + (info.def.row() * 24);
+            int buttonX = this.leftPos + 15 + (info.def.column() * 24);
+            int buttonY = this.topPos + 35 + (info.def.row() * 24);
 
-            // Draw background if unlocked
+            int itemX = buttonX + 2;
+            int itemY = buttonY + 2;
+
             if (info.isUnlocked) {
-                pGuiGraphics.blit(WIDGETS_TEXTURE, x - 3, y - 3, 0, 0, 22, 22);
+                pGuiGraphics.fill(buttonX, buttonY, buttonX + 20, buttonY + 20, 0x5000FF00);
             }
 
-            pGuiGraphics.renderItem(info.icon, x, y);
+            pGuiGraphics.renderItem(info.icon, itemX, itemY);
         }
+    }
+
+    private void renderUpgradeTooltip(GuiGraphics pGuiGraphics, UpgradeData.UpgradeDisplayInfo info, int pMouseX, int pMouseY) {
+        pGuiGraphics.renderTooltip(this.font, info.textTooltip, info.visualTooltip, pMouseX, pMouseY);
     }
 
     private void drawDependencyLine(GuiGraphics pGuiGraphics, UpgradeData.UpgradeDisplayInfo from, UpgradeData.UpgradeDisplayInfo to) {
@@ -119,4 +134,8 @@ public class UpgradeScreen extends Screen {
         pGuiGraphics.hLine(Math.min(x1, x2), Math.max(x1, x2), y1, color);
         pGuiGraphics.vLine(x2, Math.min(y1, y2), Math.max(y1, y2), color);
     }
+
+    public void refreshData() { this.init(); }
+    public boolean isForHarvester(Harvester harvester) { return this.harvester.getBlockPos().equals(harvester.getBlockPos());}
+
 }

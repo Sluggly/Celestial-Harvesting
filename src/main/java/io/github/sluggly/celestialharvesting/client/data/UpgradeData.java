@@ -1,17 +1,17 @@
 package io.github.sluggly.celestialharvesting.client.data;
 
-import io.github.sluggly.celestialharvesting.client.screen.widget.UpgradeButton;
+import io.github.sluggly.celestialharvesting.client.screen.widget.ItemListTooltipData;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
 import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
 import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +28,8 @@ public class UpgradeData {
         public final boolean hasItemRequirements;
         public final boolean hasUpgradeRequirements;
         public final boolean canUnlock;
-        public final Component tooltip;
+        public List<Component> textTooltip;
+        public Optional<TooltipComponent> visualTooltip;
 
         public UpgradeDisplayInfo(ResourceLocation id, UpgradeDefinition def, Harvester harvester, Player player) {
             this.id = id;
@@ -56,45 +57,43 @@ public class UpgradeData {
             }
             this.hasItemRequirements = itemsMet;
             this.canUnlock = !isUnlocked && hasUpgradeRequirements && hasItemRequirements;
-            this.tooltip = buildTooltip(this, player);
+            buildTooltip(this, harvester, player);
         }
 
-        private static Component buildTooltip(UpgradeDisplayInfo info, Player player) {
-            // Determine color based on row
+        private void buildTooltip(UpgradeDisplayInfo info, Harvester harvester, Player player) {
+            List<Component> textLines = new ArrayList<>();
             int color = info.def.row() < 2 ? 0xFFFFFF : (info.def.row() < 4 ? 0x00FF00 : (info.def.row() < 6 ? 0x00BFFF : 0xFF0000));
 
-            StringBuilder tooltipText = new StringBuilder();
-            tooltipText.append("\n\n").append(info.def.description());
+            // Add Title and Description
+            textLines.add(Component.literal(info.def.name()).withStyle(Style.EMPTY.withColor(color)));
+            textLines.add(Component.literal(info.def.description()).withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
             if (info.isUnlocked) {
-                tooltipText.append("\n\n§aINSTALLED!");
+                textLines.add(Component.literal("")); // Spacer
+                textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));
             } else {
+                // Add Requirements
                 if (!info.hasUpgradeRequirements) {
-                    tooltipText.append("\n\n§cRequired Upgrades:");
-                    for (String reqName : info.def.requirements()) {
-                        tooltipText.append("\n - ").append(reqName); // You can make this fancier later
-                    }
-                }
-
-                tooltipText.append("\n\n§6Cost:");
-                for (MissionItem item : info.def.cost()) {
-                    tooltipText.append("\n - ").append(item.count()).append("x ").append(item.item().getDescription().getString());
-                }
-
-                if (!info.hasItemRequirements) {
-                    tooltipText.append("\n\n§cMissing Items:");
-                    for (MissionItem item : info.def.cost()) {
-                        int owned = Utils.countItemInInventory(item.item().asItem(), player);
-                        int needed = item.count();
-                        if (owned < needed) {
-                            tooltipText.append(String.format("\n- %d %s", needed - owned, item.item().getDescription().getString()));
-                        }
+                    textLines.add(Component.literal("")); // Spacer
+                    textLines.add(Component.literal("Required Upgrades:").withStyle(Style.EMPTY.withColor(0xFF5555)));
+                    for (String reqIdStr : info.def.requirements()) {
+                        ResourceLocation reqId = new ResourceLocation(reqIdStr);
+                        UpgradeDefinition reqDef = UpgradeManager.getInstance().getAllUpgrades().get(reqId);
+                        String reqName = reqDef != null ? reqDef.name() : reqIdStr;
+                        textLines.add(Component.literal(" - " + reqName).withStyle(Style.EMPTY.withColor(0xFF5555)));
                     }
                 }
             }
 
-            Component title = Component.literal(info.def.name()).withStyle(Style.EMPTY.withColor(color));
-            return title.copy().append(Component.literal(tooltipText.toString()));
+            // Assign the text part of the tooltip
+            this.textTooltip = textLines;
+
+            // Assign the visual part of the tooltip (our item list)
+            if (!info.def.cost().isEmpty() && !info.isUnlocked) {
+                this.visualTooltip = Optional.of(new ItemListTooltipData(info.def.cost()));
+            } else {
+                this.visualTooltip = Optional.empty();
+            }
         }
     }
 
