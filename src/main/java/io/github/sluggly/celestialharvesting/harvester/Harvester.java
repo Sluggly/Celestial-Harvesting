@@ -91,11 +91,9 @@ public class Harvester extends BlockEntity implements MenuProvider {
         }
         else {
             if (pBlockEntity.getHarvesterData().hasUpgrade(SOLAR_PANEL_UPGRADE)) {
-                // Only generate power if idle (don't generate during missions) and not full
-                if (pBlockEntity.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_STATUS_IDLE) &&
+                if (pBlockEntity.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) &&
                         pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
 
-                    // Check for daytime and sky access
                     if (pLevel.isDay() && pLevel.canSeeSky(pPos.above())) {
                         pBlockEntity.energyStorage.receiveEnergy(SOLAR_GENERATION_RATE, false);
                     }

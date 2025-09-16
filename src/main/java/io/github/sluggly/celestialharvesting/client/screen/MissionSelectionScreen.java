@@ -2,6 +2,7 @@ package io.github.sluggly.celestialharvesting.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
+import io.github.sluggly.celestialharvesting.client.screen.widget.PlanetButton;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
 import io.github.sluggly.celestialharvesting.mission.Mission;

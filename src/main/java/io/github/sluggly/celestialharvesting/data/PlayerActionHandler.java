@@ -4,9 +4,13 @@ import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryMenu;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.mission.Mission;
+import io.github.sluggly.celestialharvesting.mission.MissionItem;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
 import io.github.sluggly.celestialharvesting.network.PacketHandler;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
+import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -68,6 +72,39 @@ public class PlayerActionHandler {
                             harvester.setChanged();
                             player.level().sendBlockUpdated(pos, harvester.getBlockState(), harvester.getBlockState(), 3);
                         }
+                    }
+                }
+            }
+            case NBTKeys.ACTION_UNLOCK_UPGRADE -> {
+                if (data.contains(NBTKeys.BLOCK_POS) && data.contains(NBTKeys.UPGRADE_ID)) {
+                    BlockPos pos = BlockPos.of(data.getLong(NBTKeys.BLOCK_POS));
+                    ResourceLocation upgradeId = new ResourceLocation(data.getString(NBTKeys.UPGRADE_ID));
+
+                    BlockEntity be = player.level().getBlockEntity(pos);
+                    UpgradeDefinition def = UpgradeManager.getInstance().getAllUpgrades().get(upgradeId);
+
+                    if (be instanceof Harvester harvester && def != null) {
+                        if (harvester.getHarvesterData().hasUpgrade(upgradeId)) return;
+
+                        for (String reqIdStr : def.requirements()) {
+                            if (!harvester.getHarvesterData().hasUpgrade(new ResourceLocation(reqIdStr))) return;
+                        }
+
+                        for (MissionItem item : def.cost()) {
+                            if (!Utils.hasEnoughItems(item.item().asItem(), player, item.count())) return;
+                        }
+
+                        for (MissionItem item : def.cost()) {
+                            Utils.removeItemInInventory(item.item().asItem(), item.count(), player);
+                        }
+
+                        harvester.getHarvesterData().addUpgrade(upgradeId);
+                        harvester.setChanged();
+
+                        CompoundTag payload = new CompoundTag();
+                        payload.put("HarvesterData", harvester.getHarvesterData().dataTag);
+                        payload.putLong(NBTKeys.BLOCK_POS, pos.asLong());
+                        PacketHandler.sendToPlayer(NBTKeys.ACTION_REFRESH_DATA, payload, player);
                     }
                 }
             }

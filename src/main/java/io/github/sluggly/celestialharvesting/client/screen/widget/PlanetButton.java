@@ -1,4 +1,4 @@
-package io.github.sluggly.celestialharvesting.client.screen;
+package io.github.sluggly.celestialharvesting.client.screen.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.sluggly.celestialharvesting.mission.Mission;

@@ -22,9 +22,11 @@ public class NBTKeys {
     public static final String ACTION_OPEN_HARVESTER_INVENTORY = "OpenHarvesterInventory";
     public static final String ACTION_START_MISSION = "StartMission";
     public static final String ACTION_SYNC_UPGRADES = "SyncUpgrades";
+    public static final String ACTION_UNLOCK_UPGRADE = "UnlockUpgrade";
 
     // Upgrades
     public static final String UPGRADES_DATA = "UpgradesData";
+    public static final String UPGRADE_ID = "UpgradeId";
 
     // Mission
     public static final String MISSIONS_DATA = "MissionsData";
