@@ -2,6 +2,7 @@ package io.github.sluggly.celestialharvesting.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
+import io.github.sluggly.celestialharvesting.client.screen.widget.ItemListTooltipData;
 import io.github.sluggly.celestialharvesting.client.screen.widget.PlanetButton;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
@@ -10,15 +11,18 @@ import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
 import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class MissionSelectionScreen extends Screen {
@@ -70,14 +74,40 @@ public class MissionSelectionScreen extends Screen {
     public void render(@NotNull GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(pGuiGraphics);
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
-        if (this.missionDisplayInfos != null) {
-            for (MissionDisplayInfo info : this.missionDisplayInfos) {
-                if (pMouseX >= info.x() && pMouseX <= info.x() + PLANET_TEXTURE_WIDTH &&
-                        pMouseY >= info.y() && pMouseY <= info.y() + PLANET_TEXTURE_HEIGHT) {
-                    pGuiGraphics.renderTooltip(this.font, Component.literal(info.mission().getName()), pMouseX, pMouseY);
+        for (var widget : this.renderables) {
+            if (widget instanceof PlanetButton button && button.isHoveredOrFocused()) {
+                Mission mission = button.getMission();
+                if (mission != null) {
+                    renderMissionTooltip(pGuiGraphics, mission, pMouseX, pMouseY);
+                    break;
                 }
             }
         }
+    }
+
+    private void renderMissionTooltip(GuiGraphics pGuiGraphics, Mission mission, int pMouseX, int pMouseY) {
+        List<Component> textLines = new ArrayList<>();
+
+        // Add Title
+        textLines.add(Component.literal(mission.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA));
+        textLines.add(Component.literal("")); // Spacer
+
+        // Add Fuel Cost
+        int fuelCost = mission.getFuelCost();
+        int currentFuel = this.harvester.getEnergyStored();
+        ChatFormatting fuelColor = (currentFuel >= fuelCost) ? ChatFormatting.GRAY : ChatFormatting.RED;
+        textLines.add(Component.literal("Fuel Required: ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(fuelCost + " FE").withStyle(fuelColor)));
+
+        Optional<TooltipComponent> visualComponent;
+        if (!mission.getRewards().isEmpty()) {
+            visualComponent = Optional.of(new ItemListTooltipData(Component.literal("Rewards:"), mission.getRewards()));
+        } else {
+            visualComponent = Optional.empty();
+        }
+
+        // Render the complete tooltip
+        pGuiGraphics.renderTooltip(this.font, textLines, visualComponent, pMouseX, pMouseY);
     }
 
     @Override

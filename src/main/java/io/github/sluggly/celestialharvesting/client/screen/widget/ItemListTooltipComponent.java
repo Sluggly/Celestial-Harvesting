@@ -11,33 +11,41 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ItemListTooltipComponent implements ClientTooltipComponent {
+    private final Component title;
     private final List<MissionItem> items;
-    private static final int ROW_HEIGHT = 18; // Height for each item row
-    private static final int ICON_SIZE = 16;  // Standard item icon size
+    private static final int ROW_HEIGHT = 18;
+    private static final int ICON_SIZE = 16;
 
-    public ItemListTooltipComponent(ItemListTooltipData data) { this.items = data.items(); }
+    public ItemListTooltipComponent(ItemListTooltipData data) {
+        this.title = data.title();
+        this.items = data.items();
+    }
 
     @Override
-    public int getHeight() { return 10 + (items.size() * ROW_HEIGHT); }
+    public int getHeight() {
+        return 10 + (items.size() * ROW_HEIGHT);
+    }
 
     @Override
-    public int getWidth(@NotNull Font pFont) {
-        int maxWidth = 0;
+    public int getWidth(Font pFont) {
+        int maxWidth = pFont.width(this.title);
         for (MissionItem item : items) {
             int width = pFont.width("- " + item.count() + "x " + item.item().getDescription().getString()) + ICON_SIZE + 4;
-            if (width > maxWidth) { maxWidth = width; }
+            if (width > maxWidth) {
+                maxWidth = width;
+            }
         }
         return maxWidth;
     }
 
     @Override
     public void renderImage(@NotNull Font pFont, int pX, int pY, GuiGraphics pGuiGraphics) {
-        pGuiGraphics.drawString(pFont, Component.literal("Cost:"), pX, pY, 0xFFA0A0A0, false); // Gray title
+        pGuiGraphics.drawString(pFont, this.title, pX, pY, 0xFFA0A0A0, false);
         pY += 10;
 
         for (MissionItem item : items) {
             String text = "- " + item.count() + "x " + item.item().getDescription().getString();
-            pGuiGraphics.drawString(pFont, text, pX, pY + 4, 0xFFFFFFFF, false); // White text
+            pGuiGraphics.drawString(pFont, text, pX, pY + 4, 0xFFFFFFFF, false);
 
             ItemStack stack = new ItemStack(item.item(), 1);
             int textWidth = pFont.width(text);

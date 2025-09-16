@@ -87,10 +87,9 @@ public class UpgradeData {
 
             // Assign the text part of the tooltip
             this.textTooltip = textLines;
-
-            // Assign the visual part of the tooltip (our item list)
+            
             if (!info.def.cost().isEmpty() && !info.isUnlocked) {
-                this.visualTooltip = Optional.of(new ItemListTooltipData(info.def.cost()));
+                this.visualTooltip = Optional.of(new ItemListTooltipData(Component.literal("Cost:"), info.def.cost()));
             } else {
                 this.visualTooltip = Optional.empty();
             }
