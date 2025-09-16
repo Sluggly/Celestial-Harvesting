@@ -34,6 +34,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class Harvester extends BlockEntity implements MenuProvider {
     private HarvesterData harvesterData = new HarvesterData(null);
     private static final int INVENTORY_SIZE = 54;
@@ -169,7 +171,9 @@ public class Harvester extends BlockEntity implements MenuProvider {
             try {
                 this.isInternalModification = true;
                 for (MissionItem reward : mission.getRewards()) {
-                    ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.toItemStack(), false);
+                    if (reward.chance().isEmpty() || Objects.requireNonNull(this.level).getRandom().nextDouble() < reward.chance().get()) {
+                        ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.toItemStack(), false);
+                    }
                 }
             }
             finally {

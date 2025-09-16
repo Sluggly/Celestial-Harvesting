@@ -2,7 +2,7 @@ package io.github.sluggly.celestialharvesting.init;
 
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterBlock;
-import net.minecraft.world.item.BlockItem;
+import io.github.sluggly.celestialharvesting.item.HarvesterBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -31,6 +31,7 @@ public class BlockInit {
     }
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
-        ItemInit.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+        ItemInit.ITEMS.register(name, () -> new HarvesterBlockItem(block.get(), new Item.Properties()));
     }
+
 }

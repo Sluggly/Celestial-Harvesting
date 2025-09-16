@@ -7,7 +7,8 @@
   "rewards": [
     {
       "count": 16,
-      "item": "minecraft:diamond"
+      "item": "minecraft:diamond",
+	  "chance": 0.25
     },
     {
       "count": 32,

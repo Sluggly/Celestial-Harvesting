@@ -1,6 +1,7 @@
 package io.github.sluggly.celestialharvesting.client.screen.widget;
 
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -30,7 +31,11 @@ public class ItemListTooltipComponent implements ClientTooltipComponent {
     public int getWidth(Font pFont) {
         int maxWidth = pFont.width(this.title);
         for (MissionItem item : items) {
-            int width = pFont.width("- " + item.count() + "x " + item.item().getDescription().getString()) + ICON_SIZE + 4;
+            String text = "- " + item.count() + "x " + item.item().getDescription().getString();
+            if (item.chance().isPresent() && item.chance().get() < 1.0) {
+                text += String.format(" (%.0f%%)", item.chance().get() * 100);
+            }
+            int width = pFont.width(text) + ICON_SIZE + 4;
             if (width > maxWidth) {
                 maxWidth = width;
             }
@@ -44,11 +49,17 @@ public class ItemListTooltipComponent implements ClientTooltipComponent {
         pY += 10;
 
         for (MissionItem item : items) {
-            String text = "- " + item.count() + "x " + item.item().getDescription().getString();
-            pGuiGraphics.drawString(pFont, text, pX, pY + 4, 0xFFFFFFFF, false);
+            Component itemText = Component.literal("- " + item.count() + "x " + item.item().getDescription().getString());
+
+            if (item.chance().isPresent() && item.chance().get() < 1.0) {
+                String chanceString = String.format(" (%.0f%%)", item.chance().get() * 100);
+                itemText = itemText.copy().append(Component.literal(chanceString).withStyle(ChatFormatting.GRAY));
+            }
+
+            pGuiGraphics.drawString(pFont, itemText, pX, pY + 4, 0xFFFFFFFF, false);
 
             ItemStack stack = new ItemStack(item.item(), 1);
-            int textWidth = pFont.width(text);
+            int textWidth = pFont.width(itemText);
             pGuiGraphics.renderFakeItem(stack, pX + textWidth + 4, pY);
 
             pY += ROW_HEIGHT;
