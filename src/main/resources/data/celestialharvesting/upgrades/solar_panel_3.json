@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Quantum Solar Panel",
+  "row": 3,
+  "column": 1,
+  "description": "Utilizes quantum tunneling to capture photons more efficiently, maximizing energy output.",
+  "icon": "minecraft:shroomlight",
+  "cost": [
+    {
+      "item": "minecraft:echo_shard",
+      "count": 2
+    },
+    {
+      "item": "minecraft:nether_star",
+      "count": 1
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:solar_panel_2"
+  ],
+  "solar_generation": 60
+}

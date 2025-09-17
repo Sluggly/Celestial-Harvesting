@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Solar Cells",
+  "row": 1,
+  "column": 1,
+  "description": "Basic photovoltaic cells that generate a small amount of passive energy during the day.",
+  "icon": "minecraft:daylight_detector",
+  "cost": [
+    {
+      "item": "minecraft:glass_pane",
+      "count": 16
+    },
+    {
+      "item": "minecraft:raw_copper",
+      "count": 32
+    }
+  ],
+  "requirements": [],
+  "solar_generation": 10
+}

@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Photovoltaic Array",
+  "row": 2,
+  "column": 1,
+  "description": "An improved array with superior light absorption, significantly increasing energy generation.",
+  "icon": "minecraft:glowstone",
+  "cost": [
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 8
+    },
+    {
+      "item": "minecraft:raw_gold",
+      "count": 16
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:solar_panel_1"
+  ],
+  "solar_generation": 25
+}

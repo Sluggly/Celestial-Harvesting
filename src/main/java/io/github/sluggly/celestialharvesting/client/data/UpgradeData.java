@@ -64,7 +64,6 @@ public class UpgradeData {
             List<Component> textLines = new ArrayList<>();
             int color = info.def.row() < 2 ? 0xFFFFFF : (info.def.row() < 4 ? 0x00FF00 : (info.def.row() < 6 ? 0x00BFFF : 0xFF0000));
 
-            // Add Title and Description
             textLines.add(Component.literal(info.def.name()).withStyle(Style.EMPTY.withColor(color)));
             textLines.add(Component.literal(info.def.description()).withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
@@ -96,11 +95,17 @@ public class UpgradeData {
                         .withStyle(Style.EMPTY.withColor(0xFFD700)));
             });
 
+            info.def.solar_generation().ifPresent(rate -> {
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal("Passively generates " + rate + " FE per tick")
+                        .withStyle(Style.EMPTY.withColor(0xFFFF55)));
+            });
+
             if (info.isUnlocked) {
-                textLines.add(Component.literal("")); // Spacer
+                textLines.add(Component.literal(""));
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));
-            } else {
-                // Add Requirements
+            }
+            else {
                 if (!info.hasUpgradeRequirements) {
                     textLines.add(Component.literal("")); // Spacer
                     textLines.add(Component.literal("Required Upgrades:").withStyle(Style.EMPTY.withColor(0xFF5555)));
@@ -113,7 +118,7 @@ public class UpgradeData {
                 }
             }
 
-            // Assign the text part of the tooltip
+
             this.textTooltip = textLines;
 
             if (!info.def.cost().isEmpty() && !info.isUnlocked) {

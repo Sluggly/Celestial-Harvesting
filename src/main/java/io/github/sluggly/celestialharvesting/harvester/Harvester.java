@@ -55,9 +55,6 @@ public class Harvester extends BlockEntity implements MenuProvider {
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     public ItemStackHandler getItemHandler() { return this.itemHandler; }
 
-    private static final ResourceLocation SOLAR_PANEL_UPGRADE = new ResourceLocation(CelestialHarvesting.MOD_ID, "integrated_solar_panel");
-    private static final int SOLAR_GENERATION_RATE = 10;
-
     private final Random random = new Random();
 
     private final EnergyStorage energyStorage = new EnergyStorage(20000, 512, 0) {
@@ -127,12 +124,11 @@ public class Harvester extends BlockEntity implements MenuProvider {
             else if (timeLeft % 20 == 0) { pBlockEntity.setChanged(); }
         }
         else {
-            if (pBlockEntity.getHarvesterData().hasUpgrade(SOLAR_PANEL_UPGRADE)) {
-                if (pBlockEntity.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) &&
-                        pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
-
+            int solarRate = pBlockEntity.getSolarGenerationRate();
+            if (solarRate > 0) {
+                if (pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
                     if (pLevel.isDay() && pLevel.canSeeSky(pPos.above())) {
-                        pBlockEntity.energyStorage.receiveEnergy(SOLAR_GENERATION_RATE, false);
+                        pBlockEntity.energyStorage.receiveEnergy(solarRate, false);
                     }
                 }
             }
@@ -389,6 +385,21 @@ public class Harvester extends BlockEntity implements MenuProvider {
             }
         }
         return bestRerolls;
+    }
+
+    public int getSolarGenerationRate() {
+        int bestRate = 0;
+
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.solar_generation().isPresent()) {
+                if (def.solar_generation().get() > bestRate) { bestRate = def.solar_generation().get(); }
+            }
+        }
+        return bestRate;
     }
 
 
