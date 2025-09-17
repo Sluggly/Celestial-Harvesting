@@ -85,6 +85,24 @@ public class MainScreen extends Screen {
         int percentage = (int) (((float) currentHealth / maxHealth) * 100);
         Component hullText = Component.literal("Hull: " + percentage + "%");
         pGuiGraphics.drawString(this.font, hullText, this.leftPos + 145, this.topPos + this.imageHeight - 22, 0xFFFFFF, true);
+
+        int occupiedSlots = getOccupiedSlots();
+        int totalSlots = this.harvester.getItemHandler().getSlots();
+        int availableSlots = totalSlots - occupiedSlots;
+
+        final int color;
+        if (availableSlots <= 5) { color = 0xFF5555; }
+        else if (occupiedSlots <= 20) { color = 0x55FF55; }
+        else { color = 0xFFFFFF; }
+
+        Component inventoryText = Component.literal(occupiedSlots + " / " + totalSlots);
+        int buttonY = this.topPos + this.imageHeight - 28;
+        int buttonX = this.leftPos + 8;
+
+        int textX = buttonX + 80 + 5;
+        int textY = buttonY - 40 + 6;
+
+        pGuiGraphics.drawString(this.font, inventoryText, textX, textY, color, true);
     }
 
     private void renderEnergyBar(GuiGraphics pGuiGraphics) {
@@ -110,6 +128,14 @@ public class MainScreen extends Screen {
             Component text = Component.literal(this.harvester.getEnergyStored() + " / " + this.harvester.getMaxEnergyStored() + " FE");
             pGuiGraphics.renderTooltip(this.font, text, pMouseX, pMouseY);
         }
+    }
+
+    private int getOccupiedSlots() {
+        int occupiedSlots = 0;
+        for (int i = 0; i < this.harvester.getItemHandler().getSlots(); i++) {
+            if (!this.harvester.getItemHandler().getStackInSlot(i).isEmpty()) { occupiedSlots++; }
+        }
+        return occupiedSlots;
     }
 
     @Override

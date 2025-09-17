@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Fuel Regulators",
+  "row": 1,
+  "column": 5,
+  "description": "Improves fuel combustion efficiency, reducing mission energy costs.",
+  "icon": "minecraft:blast_furnace",
+  "cost": [
+    {
+      "item": "minecraft:raw_copper",
+      "count": 64
+    },
+    {
+      "item": "minecraft:coal_block",
+      "count": 8
+    }
+  ],
+  "requirements": [],
+  "fuel_modifier": 0.9
+}

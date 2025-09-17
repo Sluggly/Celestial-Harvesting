@@ -37,6 +37,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
@@ -213,8 +214,9 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public void startMissionSequence(Mission mission) {
         if (this.level == null || this.level.isClientSide()) return;
 
-        if (getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && getEnergyStored() >= mission.getFuelCost()) {
-            consumeEnergy(mission.getFuelCost());
+        int modifiedFuelCost = getModifiedFuelCost(mission.getFuelCost());
+        if (getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && getEnergyStored() >= modifiedFuelCost) {
+            consumeEnergy(modifiedFuelCost);
             getHarvesterData().setActiveMissionID(mission.getId().toString());
             getHarvesterData().setMissionTimeLeft(getModifiedMissionTime(mission.getTravelTime()));
 
@@ -331,6 +333,22 @@ public class Harvester extends BlockEntity implements MenuProvider {
         }
 
         return (int) (baseTravelTimeInSeconds * bestModifier * 20);
+    }
+
+    public int getModifiedFuelCost(int baseFuelCost) {
+        float bestModifier = 1.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.fuel_modifier().isPresent()) {
+                if (def.fuel_modifier().get() < bestModifier) { bestModifier = def.fuel_modifier().get(); }
+            }
+        }
+
+        return (int) (baseFuelCost * bestModifier);
     }
 
 

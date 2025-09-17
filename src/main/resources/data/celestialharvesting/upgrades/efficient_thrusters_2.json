@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Magnetic Nozzles",
+  "row": 2,
+  "column": 5,
+  "description": "Uses magnetic containment to focus the plasma exhaust, saving a significant amount of energy.",
+  "icon": "minecraft:lodestone",
+  "cost": [
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 16
+    },
+    {
+      "item": "minecraft:raw_gold_block",
+      "count": 2
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:efficient_thrusters_1"
+  ],
+  "fuel_modifier": 0.75
+}

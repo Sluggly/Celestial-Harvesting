@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Energy Recycler",
+  "row": 3,
+  "column": 5,
+  "description": "Recycles waste heat from the drive core, drastically cutting fuel consumption.",
+  "icon": "minecraft:heart_of_the_sea",
+  "cost": [
+    {
+      "item": "minecraft:echo_shard",
+      "count": 4
+    },
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 1
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:efficient_thrusters_2"
+  ],
+  "fuel_modifier": 0.5
+}

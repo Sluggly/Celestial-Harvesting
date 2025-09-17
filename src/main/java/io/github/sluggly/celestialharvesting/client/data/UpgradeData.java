@@ -70,9 +70,16 @@ public class UpgradeData {
 
             info.def.speed_modifier().ifPresent(modifier -> {
                 int percentage = (int) ((1.0f - modifier) * 100);
-                textLines.add(Component.literal("")); // Spacer
+                textLines.add(Component.literal(""));
                 textLines.add(Component.literal("Reduces mission time by " + percentage + "%")
-                        .withStyle(Style.EMPTY.withColor(0x55FFFF))); // Aqua color
+                        .withStyle(Style.EMPTY.withColor(0x55FFFF)));
+            });
+
+            info.def.fuel_modifier().ifPresent(modifier -> {
+                int percentage = (int) ((1.0f - modifier) * 100);
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal("Reduces fuel cost by " + percentage + "%")
+                        .withStyle(Style.EMPTY.withColor(0xFFD700)));
             });
 
             if (info.isUnlocked) {
