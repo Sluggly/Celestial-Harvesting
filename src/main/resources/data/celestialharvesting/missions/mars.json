@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:ice",
+	  "minimum": 12,
       "count": 64
     },
     {
       "item": "minecraft:red_sand",
+	  "minimum": 32,
       "count": 64
     },
     {
       "item": "minecraft:raw_iron",
+	  "minimum": 4,
       "count": 40,
       "chance": 0.7
     },

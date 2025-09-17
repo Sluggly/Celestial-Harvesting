@@ -8,10 +8,12 @@
   "rewards": [
     {
       "item": "minecraft:ancient_debris",
+	  "minimum": 1,
       "count": 2
     },
     {
       "item": "minecraft:netherite_scrap",
+	  "minimum": 2,
       "count": 4,
       "chance": 0.5
     },

@@ -7,19 +7,23 @@
   "rewards": [
     {
       "item": "minecraft:sandstone",
+	  "minimum": 24,
       "count": 64
     },
     {
       "item": "minecraft:sand",
+	  "minimum": 24,
       "count": 64
     },
     {
       "item": "minecraft:raw_gold",
+	  "minimum": 4,
       "count": 12,
       "chance": 0.7
     },
     {
       "item": "minecraft:honeycomb_block",
+	  "minimum": 1,
       "count": 8,
       "chance": 0.2
     }

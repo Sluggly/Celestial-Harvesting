@@ -7,19 +7,23 @@
   "rewards": [
     {
       "item": "minecraft:soul_sand",
+	  "minimum": 10,
       "count": 40
     },
     {
       "item": "minecraft:granite",
+	  "minimum": 12,
       "count": 64
     },
     {
       "item": "minecraft:quartz",
+	  "minimum": 10,
       "count": 16,
       "chance": 0.7
     },
     {
       "item": "minecraft:bone_block",
+	  "minimum": 1,
       "count": 8,
       "chance": 0.25
     }

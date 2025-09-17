@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:calcite",
+	  "minimum": 12,
       "count": 48
     },
     {
       "item": "minecraft:terracotta",
+	  "minimum": 24,
       "count": 64
     },
     {
       "item": "minecraft:gunpowder",
+	  "minimum": 8,
       "count": 32,
       "chance": 0.7
     },

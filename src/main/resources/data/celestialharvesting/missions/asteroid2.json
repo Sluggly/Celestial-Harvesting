@@ -7,18 +7,22 @@
   "rewards": [
     {
       "item": "minecraft:cobblestone",
+	  "minimum": 10,
       "count": 64
     },
     {
       "item": "minecraft:diorite",
+	  "minimum": 8,
       "count": 48
     },
     {
       "item": "minecraft:gravel",
+	  "minimum": 4,
       "count": 32
     },
     {
       "item": "minecraft:glowstone_dust",
+	  "minimum": 4,
       "count": 12,
       "chance": 0.3
     }

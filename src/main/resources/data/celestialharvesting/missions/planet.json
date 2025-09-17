@@ -7,10 +7,12 @@
   "rewards": [
     {
       "item": "minecraft:end_stone",
+	  "minimum": 16,
       "count": 64
     },
     {
       "item": "minecraft:sand",
+	  "minimum": 24,
       "count": 48
     },
     {

@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:packed_mud",
+	  "minimum": 12,
       "count": 48
     },
     {
       "item": "minecraft:dripstone_block",
+	  "minimum": 8,
       "count": 32
     },
     {
       "item": "minecraft:gunpowder",
+	  "minimum": 10,
       "count": 24,
       "chance": 0.7
     },

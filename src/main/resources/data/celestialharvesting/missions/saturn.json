@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:packed_ice",
+	  "minimum": 8,
       "count": 64
     },
     {
       "item": "minecraft:calcite",
+	  "minimum": 10,
       "count": 32
     },
     {
       "item": "minecraft:amethyst_shard",
+	  "minimum": 12,
       "count": 24,
       "chance": 0.6
     },

@@ -267,7 +267,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
                 this.isInternalModification = true;
                 for (MissionItem reward : mission.getRewards()) {
                     if (reward.chance().isEmpty() || Objects.requireNonNull(this.level).getRandom().nextDouble() < reward.chance().get()) {
-                        ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.toItemStack(), false);
+                        ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.getRandomizedStack(this.random), false);
                     }
                 }
             }

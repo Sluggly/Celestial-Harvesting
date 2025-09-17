@@ -7,14 +7,17 @@
   "rewards": [
     {
       "item": "minecraft:oak_log",
+	  "minimum": 16,
       "count": 64
     },
     {
       "item": "minecraft:podzol",
+	  "minimum": 12,
       "count": 32
     },
     {
       "item": "minecraft:potato",
+	  "minimum": 8,
       "count": 24
     },
     {

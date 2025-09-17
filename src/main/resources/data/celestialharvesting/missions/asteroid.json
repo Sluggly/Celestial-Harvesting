@@ -7,18 +7,22 @@
   "rewards": [
     {
       "item": "minecraft:coal",
+	  "minimum": 4,
       "count": 64
     },
     {
       "item": "minecraft:raw_iron",
+	  "minimum": 2,
       "count": 24
     },
     {
       "item": "minecraft:blackstone",
+	  "minimum": 10,
       "count": 48
     },
     {
       "item": "minecraft:obsidian",
+	  "minimum": 4,
       "count": 8,
       "chance": 0.25
     }

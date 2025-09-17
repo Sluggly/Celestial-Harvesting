@@ -8,10 +8,12 @@
   "rewards": [
     {
       "item": "minecraft:packed_ice",
+	  "minimum": 32,
       "count": 64
     },
     {
       "item": "minecraft:diorite",
+	  "minimum": 12,
       "count": 48
     },
     {

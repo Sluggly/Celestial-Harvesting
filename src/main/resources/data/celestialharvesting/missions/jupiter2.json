@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:red_nether_bricks",
+	  "minimum": 24,
       "count": 64
     },
     {
       "item": "minecraft:nether_wart_block",
+	  "minimum": 8,
       "count": 32
     },
     {
       "item": "minecraft:experience_bottle",
+	  "minimum": 10,
       "count": 32,
       "chance": 0.4
     },

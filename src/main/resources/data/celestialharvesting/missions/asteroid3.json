@@ -7,10 +7,12 @@
   "rewards": [
     {
       "item": "minecraft:raw_copper",
+	  "minimum": 5,
       "count": 40
     },
     {
       "item": "minecraft:tuff",
+	  "minimum": 10,
       "count": 50
     },
     {
@@ -20,6 +22,7 @@
     },
     {
       "item": "minecraft:lapis_lazuli",
+	  "minimum": 10,
       "count": 16,
       "chance": 0.2
     }

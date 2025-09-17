@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:cobbled_deepslate",
+	  "minimum": 32,
       "count": 64
     },
     {
       "item": "minecraft:raw_iron",
+	  "minimum": 4,
       "count": 48
     },
     {
       "item": "minecraft:amethyst_shard",
+	  "minimum": 2,
       "count": 12,
       "chance": 0.6
     },

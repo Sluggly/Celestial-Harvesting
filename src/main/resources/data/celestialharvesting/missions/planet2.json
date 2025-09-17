@@ -8,14 +8,17 @@
   "rewards": [
     {
       "item": "minecraft:lapis_lazuli",
+	  "minimum": 12,
       "count": 64
     },
     {
       "item": "minecraft:prismarine_shards",
+	  "minimum": 4,
       "count": 32
     },
     {
       "item": "minecraft:blue_ice",
+	  "minimum": 4,
       "count": 16,
       "chance": 0.5
     },

@@ -8,10 +8,12 @@
   "rewards": [
     {
       "item": "minecraft:magma_block",
+	  "minimum": 38,
       "count": 64
     },
     {
       "item": "minecraft:glowstone",
+	  "minimum": 20,
       "count": 32
     },
     {

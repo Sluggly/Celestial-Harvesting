@@ -7,19 +7,23 @@
   "rewards": [
     {
       "item": "minecraft:andesite",
+	  "minimum": 32,
       "count": 64
     },
     {
       "item": "minecraft:sand",
+	  "minimum": 24,
       "count": 48
     },
     {
       "item": "minecraft:raw_gold",
+	  "minimum": 5,
       "count": 10,
       "chance": 0.6
     },
     {
       "item": "minecraft:calcite",
+	  "minimum": 8,
       "count": 16,
       "chance": 0.2
     }
