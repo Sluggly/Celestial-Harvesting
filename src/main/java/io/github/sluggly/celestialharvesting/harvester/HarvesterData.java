@@ -1,5 +1,7 @@
 package io.github.sluggly.celestialharvesting.harvester;
 
+import io.github.sluggly.celestialharvesting.mission.Mission;
+import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -7,9 +9,7 @@ import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.sluggly.celestialharvesting.utils.NBTKeys.*;
 
@@ -27,6 +27,7 @@ public class HarvesterData {
             this.dataTag.putInt(HARVESTER_MISSION_TIME_LEFT, 0);
             this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, "");
             this.dataTag.put(HARVESTER_UPGRADES, new ListTag());
+            rerollMissions();
         }
         else { this.dataTag = tag; }
     }
@@ -75,6 +76,61 @@ public class HarvesterData {
         ListTag upgrades = this.dataTag.getList(HARVESTER_UPGRADES, Tag.TAG_STRING);
         for (Tag tag : upgrades) { unlocked.add(new ResourceLocation(tag.getAsString())); }
         return unlocked;
+    }
+
+    public void rerollMissions() {
+        int currentTier = this.getTier();
+        int missionCountToSelect = this.getNumberOfMissions(this.getSeed());
+        List<ResourceLocation> finalMissionList = new ArrayList<>();
+        Random random = new Random(this.getSeed());
+
+        List<ResourceLocation> eligibleMissions = new ArrayList<>();
+        List<ResourceLocation> ineligibleMissions = new ArrayList<>();
+
+        for (ResourceLocation id : MissionManager.getInstance().getAllMissions().keySet()) {
+            Mission mission = Mission.getMissionFromId(id);
+            if (mission != null) {
+                if (mission.getRequiredTier() <= currentTier) { eligibleMissions.add(id); }
+                else { ineligibleMissions.add(id); }
+            }
+        }
+
+        if (eligibleMissions.isEmpty()) {
+            System.err.println("CELESTIAL HARVESTING: No missions available for Tier " + currentTier + "! Harvester will have no missions. Please check your mission JSON files.");
+            this.dataTag.put(HARVESTER_AVAILABLE_MISSIONS, new ListTag());
+            return;
+        }
+
+        Collections.shuffle(eligibleMissions, random);
+        ResourceLocation guaranteedMission = eligibleMissions.remove(0);
+        finalMissionList.add(guaranteedMission);
+
+        List<ResourceLocation> remainingCandidates = new ArrayList<>();
+        remainingCandidates.addAll(eligibleMissions);
+        remainingCandidates.addAll(ineligibleMissions);
+        Collections.shuffle(remainingCandidates, random);
+
+        int remainingToSelect = Math.min(missionCountToSelect - 1, remainingCandidates.size());
+        for (int i = 0; i < remainingToSelect; i++) {
+            finalMissionList.add(remainingCandidates.get(i));
+        }
+
+        ListTag missionListTag = new ListTag();
+        for (ResourceLocation missionId : finalMissionList) {
+            missionListTag.add(StringTag.valueOf(missionId.toString()));
+        }
+        this.dataTag.put(HARVESTER_AVAILABLE_MISSIONS, missionListTag);
+    }
+
+    public List<ResourceLocation> getAvailableMissions() {
+        List<ResourceLocation> missions = new ArrayList<>();
+        if (this.dataTag.contains(HARVESTER_AVAILABLE_MISSIONS, Tag.TAG_LIST)) {
+            ListTag missionListTag = this.dataTag.getList(HARVESTER_AVAILABLE_MISSIONS, Tag.TAG_STRING);
+            for (Tag tag : missionListTag) {
+                missions.add(new ResourceLocation(tag.getAsString()));
+            }
+        }
+        return missions;
     }
 
 }

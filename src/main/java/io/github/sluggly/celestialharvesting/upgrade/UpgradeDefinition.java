@@ -18,7 +18,8 @@ public record UpgradeDefinition(
         Item icon,
         List<MissionItem> cost,
         List<String> requirements,
-        Optional<Integer> grantsTier
+        Optional<Integer> grantsTier,
+        Optional<Float> speed_modifier
 ) {
     public static final Codec<UpgradeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(UpgradeDefinition::name),
@@ -28,6 +29,7 @@ public record UpgradeDefinition(
             ForgeRegistries.ITEMS.getCodec().fieldOf("icon").forGetter(UpgradeDefinition::icon),
             MissionItem.CODEC.listOf().fieldOf("cost").forGetter(UpgradeDefinition::cost),
             Codec.STRING.listOf().optionalFieldOf("requirements", List.of()).forGetter(UpgradeDefinition::requirements),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("grantsTier").forGetter(UpgradeDefinition::grantsTier)
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("grantsTier").forGetter(UpgradeDefinition::grantsTier),
+            Codec.FLOAT.optionalFieldOf("speed_modifier").forGetter(UpgradeDefinition::speed_modifier)
     ).apply(instance, UpgradeDefinition::new));
 }

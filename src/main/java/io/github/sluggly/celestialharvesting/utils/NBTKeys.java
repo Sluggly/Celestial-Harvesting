@@ -13,6 +13,7 @@ public class NBTKeys {
     public static final String HARVESTER_MISSION_TIME_LEFT = "TimeLeft";
     public static final String HARVESTER_ACTIVE_MISSION_ID = "MissionId";
     public static final String HARVESTER_UPGRADES = "Upgrades";
+    public static final String HARVESTER_AVAILABLE_MISSIONS = "AvailableMissions";
 
     // Packet Action
     public static final String ACTION_OPEN_HARVESTER_SCREEN = "OpenHarvesterScreen";

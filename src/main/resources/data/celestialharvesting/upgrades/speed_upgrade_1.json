@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Thruster Tuning",
+  "row": 1,
+  "column": 4,
+  "description": "Optimizes fuel flow to the main thrusters, improving travel time.",
+  "icon": "minecraft:fire_charge",
+  "cost": [
+    {
+      "item": "minecraft:raw_iron",
+      "count": 64
+    },
+    {
+      "item": "minecraft:redstone",
+      "count": 32
+    }
+  ],
+  "requirements": [],
+  "speed_modifier": 0.9
+}

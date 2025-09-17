@@ -1,6 +1,6 @@
 {
   "name": "Saturn",
-  "icon": saturn",
+  "icon": "saturn",
   "tier": 2,
   "travel": 110,
   "fuel": 4600,

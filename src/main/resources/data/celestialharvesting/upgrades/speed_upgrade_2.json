@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Plasma Injectors",
+  "row": 2,
+  "column": 4,
+  "description": "Injects superheated plasma into the drive core for a significant speed boost.",
+  "icon": "minecraft:blaze_powder",
+  "cost": [
+    {
+      "item": "minecraft:diamond",
+      "count": 8
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "count": 32
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:speed_upgrade_1"
+  ],
+  "speed_modifier": 0.75
+}

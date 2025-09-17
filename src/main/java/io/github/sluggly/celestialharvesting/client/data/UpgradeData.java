@@ -68,6 +68,13 @@ public class UpgradeData {
             textLines.add(Component.literal(info.def.name()).withStyle(Style.EMPTY.withColor(color)));
             textLines.add(Component.literal(info.def.description()).withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
+            info.def.speed_modifier().ifPresent(modifier -> {
+                int percentage = (int) ((1.0f - modifier) * 100);
+                textLines.add(Component.literal("")); // Spacer
+                textLines.add(Component.literal("Reduces mission time by " + percentage + "%")
+                        .withStyle(Style.EMPTY.withColor(0x55FFFF))); // Aqua color
+            });
+
             if (info.isUnlocked) {
                 textLines.add(Component.literal("")); // Spacer
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));
@@ -87,7 +94,7 @@ public class UpgradeData {
 
             // Assign the text part of the tooltip
             this.textTooltip = textLines;
-            
+
             if (!info.def.cost().isEmpty() && !info.isUnlocked) {
                 this.visualTooltip = Optional.of(new ItemListTooltipData(Component.literal("Cost:"), info.def.cost()));
             } else {

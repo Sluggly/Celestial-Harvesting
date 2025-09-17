@@ -5,6 +5,8 @@ import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 public class Harvester extends BlockEntity implements MenuProvider {
     private HarvesterData harvesterData = new HarvesterData(null);
@@ -213,7 +216,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
         if (getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && getEnergyStored() >= mission.getFuelCost()) {
             consumeEnergy(mission.getFuelCost());
             getHarvesterData().setActiveMissionID(mission.getId().toString());
-            getHarvesterData().setMissionTimeLeft(mission.getTravelTime() * 20);
+            getHarvesterData().setMissionTimeLeft(getModifiedMissionTime(mission.getTravelTime()));
 
             this.animationState = AnimationState.TAKING_OFF;
             this.animationTick = 0;
@@ -251,7 +254,8 @@ public class Harvester extends BlockEntity implements MenuProvider {
 
         if (this.harvesterData.getCurrentHealth() <= 0) {
             for (int i = 0; i < this.itemHandler.getSlots(); i++) { this.itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
-        } else {
+        }
+        else {
             try {
                 this.isInternalModification = true;
                 for (MissionItem reward : mission.getRewards()) {
@@ -259,14 +263,16 @@ public class Harvester extends BlockEntity implements MenuProvider {
                         ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.toItemStack(), false);
                     }
                 }
-            } finally {
-                this.isInternalModification = false;
             }
+            finally { this.isInternalModification = false; }
         }
 
         this.harvesterData.setStatus(NBTKeys.HARVESTER_IDLE);
         this.harvesterData.setActiveMissionID("");
         this.harvesterData.setMissionTimeLeft(0);
+
+        this.harvesterData.generateSeed();
+        this.harvesterData.rerollMissions();
 
         setChanged();
         if (level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
@@ -308,6 +314,23 @@ public class Harvester extends BlockEntity implements MenuProvider {
             this.level.addParticle(ParticleTypes.LARGE_SMOKE, px, groundY, pz, vx, vy, vz);
             this.level.addParticle(ParticleTypes.FLAME, px, groundY, pz, 0, vy, 0);
         }
+    }
+
+    public int getModifiedMissionTime(int baseTravelTimeInSeconds) {
+        if (this.level == null || this.level.isClientSide()) { return baseTravelTimeInSeconds * 20; }
+
+        float bestModifier = 1.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = UpgradeManager.getInstance().getAllUpgrades().get(upgradeId);
+            if (def != null && def.speed_modifier().isPresent()) {
+                if (def.speed_modifier().get() < bestModifier) { bestModifier = def.speed_modifier().get(); }
+            }
+        }
+
+        return (int) (baseTravelTimeInSeconds * bestModifier * 20);
     }
 
 

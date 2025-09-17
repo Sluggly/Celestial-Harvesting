@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Warp Field Coil",
+  "row": 3,
+  "column": 4,
+  "description": "Generates a localized warp field, drastically reducing mission duration.",
+  "icon": "minecraft:ender_eye",
+  "cost": [
+    {
+      "item": "minecraft:netherite_scrap",
+      "count": 2
+    },
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 16
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:speed_upgrade_2"
+  ],
+  "speed_modifier": 0.5
+}

@@ -1,0 +1,25 @@
+{
+  "name": "Tier 3 Singularity Drive",
+  "row": 0,
+  "column": 8,
+  "description": "Harnessing a micro-singularity, this drive allows travel to the most dangerous destinations in the universe. Unlocks Tier 3 missions.",
+  "icon": "minecraft:beacon",
+  "cost": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 2
+    },
+    {
+      "item": "minecraft:shulker_shell",
+      "count": 4
+    },
+    {
+      "item": "minecraft:amethyst_block",
+      "count": 16
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive"
+  ],
+  "grantsTier": 3
+}

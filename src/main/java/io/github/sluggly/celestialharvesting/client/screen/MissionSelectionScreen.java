@@ -130,8 +130,11 @@ public class MissionSelectionScreen extends Screen {
     public boolean isPauseScreen() { return false; }
 
     private void calculateMissionPositions() {
-        List<Mission> missionsToDisplay = MissionManager.getInstance().getAllMissions().entrySet().stream()
-                .map(entry -> new Mission(entry.getKey(), entry.getValue()))
+        List<ResourceLocation> availableMissionIds = this.harvester.getHarvesterData().getAvailableMissions();
+
+        List<Mission> missionsToDisplay = availableMissionIds.stream()
+                .map(Mission::getMissionFromId)
+                .filter(Objects::nonNull)
                 .toList();
 
         if (missionsToDisplay.isEmpty()) {
