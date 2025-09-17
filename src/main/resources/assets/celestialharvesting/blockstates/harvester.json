@@ -1,5 +1,10 @@
 {
   "variants": {
-    "": { "model": "celestialharvesting:block/harvester" }
+    "state=IDLE": {
+      "model": "celestialharvesting:block/harvester"
+    },
+    "state=IN_MISSION": {
+      "model": "celestialharvesting:block/harvester"
+    }
   }
 }

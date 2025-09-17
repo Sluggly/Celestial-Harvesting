@@ -51,7 +51,6 @@ public class MissionSelectionScreen extends Screen {
 
         if (this.missionDisplayInfos != null) {
             for (MissionDisplayInfo info : this.missionDisplayInfos) {
-                // Use our new PlanetButton
                 addRenderableWidget(new PlanetButton(info.x(), info.y(), PLANET_TEXTURE_WIDTH, PLANET_TEXTURE_HEIGHT, info.mission(),
                         (button) -> {
                             if (this.harvester.getEnergyStored() >= info.mission().getFuelCost()) {
@@ -106,7 +105,6 @@ public class MissionSelectionScreen extends Screen {
             visualComponent = Optional.empty();
         }
 
-        // Render the complete tooltip
         pGuiGraphics.renderTooltip(this.font, textLines, visualComponent, pMouseX, pMouseY);
     }
 
@@ -138,17 +136,13 @@ public class MissionSelectionScreen extends Screen {
             return;
         }
 
-        // Use the harvester's seed for deterministic "random" placement
         Random random = new Random(this.harvesterData.getSeed());
 
-        // --- Core Layout Logic ---
         int missionCount = missionsToDisplay.size();
 
-        // 1. Determine the best grid dimensions (rows x columns)
         int cols = (int) Math.ceil(Math.sqrt(missionCount));
         int rows = (int) Math.ceil((double) missionCount / cols);
 
-        // Adjust for screen aspect ratio to make cells more square-like
         if (this.width > this.height) {
             cols = Math.max(rows, cols);
             rows = (int) Math.ceil((double) missionCount / cols);
@@ -158,7 +152,6 @@ public class MissionSelectionScreen extends Screen {
             cols = (int) Math.ceil((double) missionCount / rows);
         }
 
-        // 2. Calculate the size of each grid cell
         int cellWidth = (this.width - 2 * SAFE_ZONE_PADDING) / cols;
         int cellHeight = (this.height - 2 * SAFE_ZONE_PADDING) / rows;
 
@@ -169,16 +162,12 @@ public class MissionSelectionScreen extends Screen {
             int gridRow = i / cols;
             int gridCol = i % cols;
 
-            // 3. Find the top-left corner of the cell
             int cellX = SAFE_ZONE_PADDING + gridCol * cellWidth;
             int cellY = SAFE_ZONE_PADDING + gridRow * cellHeight;
 
-            // 4. Calculate the random "jitter" within the cell
-            // We ensure the planet texture stays fully inside its cell
             int xJitterRange = cellWidth - PLANET_TEXTURE_WIDTH;
             int yJitterRange = cellHeight - PLANET_TEXTURE_HEIGHT;
 
-            // Ensure range is not negative if the screen is too small
             int xJitter = (xJitterRange > 0) ? random.nextInt(xJitterRange) : 0;
             int yJitter = (yJitterRange > 0) ? random.nextInt(yJitterRange) : 0;
 

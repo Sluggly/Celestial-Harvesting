@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.client.model.HarvesterModel;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
+import io.github.sluggly.celestialharvesting.harvester.HarvesterBlock;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -22,7 +23,14 @@ public class HarvesterRenderer implements BlockEntityRenderer<Harvester> {
 
     @Override
     public void render(@NotNull Harvester pBlockEntity, float pPartialTick, @NotNull PoseStack pPoseStack, @NotNull MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
+        if (pBlockEntity.getBlockState().getValue(HarvesterBlock.STATE) == HarvesterBlock.State.IN_MISSION && pBlockEntity.getAnimationState() == Harvester.AnimationState.NONE) {
+            return;
+        }
+
         pPoseStack.pushPose();
+
+        float yOffset = pBlockEntity.getAnimationYOffset(pPartialTick);
+        pPoseStack.translate(0, yOffset, 0);
 
         pPoseStack.translate(0.5, 1.5, 0.5);
         pPoseStack.mulPose(Axis.XP.rotationDegrees(180));

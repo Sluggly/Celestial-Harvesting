@@ -43,19 +43,16 @@ public class UpgradeScreen extends Screen {
 
         this.upgradeData = new UpgradeData(this.harvester);
 
-        // Back Button
         assert minecraft != null;
         addRenderableWidget(Button.builder(Component.literal("< Back"),
                         (button) -> this.minecraft.setScreen(this.lastScreen))
                 .bounds(this.leftPos + 5, this.topPos + 5, 50, 20).build());
 
-        // Create buttons for each upgrade
         for (UpgradeData.UpgradeDisplayInfo info : this.upgradeData.upgradeInfoMap.values()) {
             int x = this.leftPos + 15 + (info.def.column() * 24);
             int y = this.topPos + 35 + (info.def.row() * 24);
 
             UpgradeButton button = new UpgradeButton(x, y, 20, 20, info.id, (btn) -> {
-                // Send unlock request to server
                 CompoundTag data = new CompoundTag();
                 data.putLong(NBTKeys.BLOCK_POS, this.harvester.getBlockPos().asLong());
                 data.putString(NBTKeys.UPGRADE_ID, ((UpgradeButton)btn).upgradeId.toString());
@@ -74,7 +71,7 @@ public class UpgradeScreen extends Screen {
 
         renderUpgradeGrid(pGuiGraphics);
 
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick); // Renders buttons and their tooltips
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
 
         for (var widget : this.renderables) {
             if (widget instanceof UpgradeButton button && button.isHoveredOrFocused()) {
@@ -92,7 +89,6 @@ public class UpgradeScreen extends Screen {
     private void renderUpgradeGrid(GuiGraphics pGuiGraphics) {
         if (this.upgradeData == null) return;
 
-        // Render dependency lines first so they are behind the icons
         for (UpgradeData.UpgradeDisplayInfo info : this.upgradeData.upgradeInfoMap.values()) {
             for (String reqIdStr : info.def.requirements()) {
                 ResourceLocation reqId = new ResourceLocation(reqIdStr);

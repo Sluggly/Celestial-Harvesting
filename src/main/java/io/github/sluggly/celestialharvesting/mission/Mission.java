@@ -14,43 +14,25 @@ public class Mission {
         this.definition = definition;
     }
 
-    public ResourceLocation getId() {
-        return id;
-    }
+    public ResourceLocation getId() { return id; }
 
-    public String getName() {
-        return definition.name();
-    }
+    public String getName() { return definition.name(); }
 
-    public ResourceLocation getIcon() {
-        return new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/" + definition.icon() + ".png");
-    }
+    public ResourceLocation getIcon() { return new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/" + definition.icon() + ".png"); }
 
-    public int getTravelTime() {
-        return definition.travel();
-    }
+    public int getTravelTime() { return definition.travel(); }
 
-    public int getFuelCost() {
-        return definition.fuel();
-    }
+    public int getFuelCost() { return definition.fuel(); }
 
-    public List<String> getRequiredModules() {
-        return definition.module().orElse(List.of());
-    }
+    public List<String> getRequiredModules() { return definition.module().orElse(List.of()); }
 
-    public int getDamage() {
-        return definition.damage();
-    }
+    public int getDamage() { return definition.damage(); }
 
-    public List<MissionItem> getRewards() {
-        return definition.rewards();
-    }
+    public List<MissionItem> getRewards() { return definition.rewards(); }
 
     public static Mission getMissionFromId(ResourceLocation missionId) {
         MissionDefinition definition = MissionManager.getInstance().getMission(missionId);
-        if (definition != null) {
-            return new Mission(missionId, definition);
-        }
+        if (definition != null) { return new Mission(missionId, definition); }
         return null;
     }
 }

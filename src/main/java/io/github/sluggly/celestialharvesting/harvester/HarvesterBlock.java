@@ -7,25 +7,49 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class HarvesterBlock extends BaseEntityBlock {
 
-    public HarvesterBlock(Properties pProperties) { super(pProperties); }
+    public enum State implements StringRepresentable {
+        IDLE("idle"),
+        IN_MISSION("in_mission");
+
+        private final String name;
+
+        State(String name) { this.name = name; }
+
+        @Override
+        public @NotNull String getSerializedName() { return this.name; }
+    }
+    public static final EnumProperty<State> STATE = EnumProperty.create("state", State.class);
+
+    public HarvesterBlock(Properties pProperties) {
+        super(pProperties.pushReaction(PushReaction.BLOCK));
+        this.registerDefaultState(this.stateDefinition.any().setValue(STATE, State.IDLE));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) { pBuilder.add(STATE); }
 
     @Nullable
     @Override
@@ -60,5 +84,18 @@ public class HarvesterBlock extends BaseEntityBlock {
     @SuppressWarnings("deprecation")
     public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public float getDestroyProgress(BlockState pState, @NotNull Player pPlayer, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos) {
+        if (pState.getValue(STATE) == State.IN_MISSION) { return 0.0F; }
+        return super.getDestroyProgress(pState, pPlayer, pLevel, pPos);
+    }
+
+    @Override
+    public float getExplosionResistance(BlockState state, BlockGetter world, BlockPos pos, Explosion explosion) {
+        if (state.getValue(STATE) == State.IN_MISSION) { return 3600000.0F; }
+        return super.getExplosionResistance(state, world, pos, explosion);
     }
 }

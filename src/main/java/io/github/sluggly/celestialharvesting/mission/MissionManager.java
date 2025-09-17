@@ -49,15 +49,10 @@ public class MissionManager extends SimpleJsonResourceReloadListener {
         System.out.println("Loaded " + this.loadedMissions.size() + " mission definitions.");
     }
 
-    public MissionDefinition getMission(ResourceLocation id) {
-        return this.loadedMissions.get(id);
-    }
+    public MissionDefinition getMission(ResourceLocation id) { return this.loadedMissions.get(id); }
 
-    public Map<ResourceLocation, MissionDefinition> getAllMissions() {
-        return this.loadedMissions;
-    }
+    public Map<ResourceLocation, MissionDefinition> getAllMissions() { return this.loadedMissions; }
 
-    // This method will be called on the client side when receiving the sync packet
     public void setMissions(Map<ResourceLocation, MissionDefinition> missions) {
         this.loadedMissions = missions;
         System.out.println("Client received and loaded " + this.loadedMissions.size() + " missions.");

@@ -62,16 +62,7 @@ public class PlayerActionHandler {
                     if (be instanceof Harvester harvester) {
                         Mission mission = Mission.getMissionFromId(missionId);
                         if (mission == null) return;
-
-                        if (harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && harvester.getEnergyStored() >= mission.getFuelCost()) {
-                            harvester.consumeEnergy(mission.getFuelCost());
-                            harvester.getHarvesterData().setStatus(NBTKeys.HARVESTER_ONGOING);
-                            harvester.getHarvesterData().setActiveMissionID(missionId.toString());
-                            harvester.getHarvesterData().setMissionTimeLeft(mission.getTravelTime() * 20);
-
-                            harvester.setChanged();
-                            player.level().sendBlockUpdated(pos, harvester.getBlockState(), harvester.getBlockState(), 3);
-                        }
+                        harvester.startMissionSequence(mission);
                     }
                 }
             }

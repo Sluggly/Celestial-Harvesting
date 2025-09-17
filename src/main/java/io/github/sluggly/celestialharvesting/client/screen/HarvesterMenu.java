@@ -112,15 +112,11 @@ public class HarvesterMenu extends AbstractContainerMenu {
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyStack = sourceStack.copy();
 
-        // Player Inventory slots are typically 0-35. Adjust if you add your own slots.
         if (pIndex < 36) {
-            // Trying to move from player inventory to... nowhere. So fail.
-            // Or if you had your own slots, you'd try to move it there.
             if (!this.moveItemStackTo(sourceStack, 36, this.slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
         } else if (!this.moveItemStackTo(sourceStack, 0, 36, false)) {
-            // Trying to move from custom slots to player inventory.
             return ItemStack.EMPTY;
         }
 
