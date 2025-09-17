@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Probability Matrix",
+  "row": 2,
+  "column": 7,
+  "description": "Calculates optimal harvest vectors in real-time, tripling the effective loot rolls.",
+  "icon": "minecraft:recovery_compass",
+  "cost": [
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 32
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 10
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:loot_upgrade_1"
+  ],
+  "loot_rerolls": 2
+}

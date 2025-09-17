@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Prospector",
+  "row": 1,
+  "column": 7,
+  "description": "Advanced scanners analyze the mission area, allowing the harvester to perform an additional resource collection cycle.",
+  "icon": "minecraft:spyglass",
+  "cost": [
+    {
+      "item": "minecraft:emerald",
+      "count": 16
+    },
+    {
+      "item": "minecraft:raw_gold",
+      "count": 32
+    }
+  ],
+  "requirements": [],
+  "loot_rerolls": 1
+}

@@ -263,15 +263,18 @@ public class Harvester extends BlockEntity implements MenuProvider {
             for (int i = 0; i < this.itemHandler.getSlots(); i++) { this.itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
         }
         else {
-            try {
-                this.isInternalModification = true;
-                for (MissionItem reward : mission.getRewards()) {
-                    if (reward.chance().isEmpty() || Objects.requireNonNull(this.level).getRandom().nextDouble() < reward.chance().get()) {
-                        ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.getRandomizedStack(this.random), false);
+            int totalRolls = 1 + this.getLootRerollCount();
+            for (int i = 0; i < totalRolls; i++) {
+                try {
+                    this.isInternalModification = true;
+                    for (MissionItem reward : mission.getRewards()) {
+                        if (reward.chance().isEmpty() || this.random.nextDouble() < reward.chance().get()) {
+                            ItemHandlerHelper.insertItemStacked(this.itemHandler, reward.getRandomizedStack(this.random), false);
+                        }
                     }
                 }
+                finally { this.isInternalModification = false; }
             }
-            finally { this.isInternalModification = false; }
         }
 
         this.harvesterData.setStatus(NBTKeys.HARVESTER_IDLE);
@@ -371,6 +374,21 @@ public class Harvester extends BlockEntity implements MenuProvider {
             }
         }
         return bestChance;
+    }
+
+    public int getLootRerollCount() {
+        int bestRerolls = 0;
+
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.loot_rerolls().isPresent()) {
+                if (def.loot_rerolls().get() > bestRerolls) { bestRerolls = def.loot_rerolls().get(); }
+            }
+        }
+        return bestRerolls;
     }
 
 

@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Quantum Analyzer",
+  "row": 3,
+  "column": 7,
+  "description": "Briefly analyzes parallel timelines to identify and retrieve resources from the most optimal outcomes.",
+  "icon": "minecraft:nether_star",
+  "cost": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 2
+    },
+    {
+      "item": "minecraft:echo_shard",
+      "count": 8
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:loot_upgrade_2"
+  ],
+  "loot_rerolls": 3
+}

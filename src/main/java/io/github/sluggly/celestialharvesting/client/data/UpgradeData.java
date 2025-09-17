@@ -89,6 +89,13 @@ public class UpgradeData {
                         .withStyle(Style.EMPTY.withColor(0x55FF55)));
             });
 
+            info.def.loot_rerolls().ifPresent(rerolls -> {
+                String times = (rerolls == 1) ? "1 extra time" : rerolls + " extra times";
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal("Triggers the loot table " + times)
+                        .withStyle(Style.EMPTY.withColor(0xFFD700)));
+            });
+
             if (info.isUnlocked) {
                 textLines.add(Component.literal("")); // Spacer
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));
