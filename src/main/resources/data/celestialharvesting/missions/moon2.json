@@ -1,0 +1,27 @@
+{
+  "name": "Umbral Moon",
+  "icon": "moon2",
+  "travel": 45,
+  "fuel": 850,
+  "damage": 10,
+  "rewards": [
+    {
+      "item": "minecraft:soul_sand",
+      "count": 40
+    },
+    {
+      "item": "minecraft:granite",
+      "count": 64
+    },
+    {
+      "item": "minecraft:quartz",
+      "count": 16,
+      "chance": 0.7
+    },
+    {
+      "item": "minecraft:bone_block",
+      "count": 8,
+      "chance": 0.25
+    }
+  ]
+}

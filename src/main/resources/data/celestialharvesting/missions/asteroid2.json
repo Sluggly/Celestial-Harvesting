@@ -1,0 +1,26 @@
+{
+  "name": "Asteroid",
+  "icon": "asteroid2",
+  "travel": 35,
+  "fuel": 750,
+  "damage": 5,
+  "rewards": [
+    {
+      "item": "minecraft:cobblestone",
+      "count": 64
+    },
+    {
+      "item": "minecraft:diorite",
+      "count": 48
+    },
+    {
+      "item": "minecraft:gravel",
+      "count": 32
+    },
+    {
+      "item": "minecraft:glowstone_dust",
+      "count": 12,
+      "chance": 0.3
+    }
+  ]
+}

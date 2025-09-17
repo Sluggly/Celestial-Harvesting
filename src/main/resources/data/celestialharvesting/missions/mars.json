@@ -1,0 +1,28 @@
+{
+  "name": "Mars",
+  "icon": "mars",
+  "tier": 2,
+  "travel": 80,
+  "fuel": 4000,
+  "damage": 30,
+  "rewards": [
+    {
+      "item": "minecraft:ice",
+      "count": 64
+    },
+    {
+      "item": "minecraft:red_sand",
+      "count": 64
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 40,
+      "chance": 0.7
+    },
+    {
+      "item": "minecraft:spire_armor_trim_smithing_template",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

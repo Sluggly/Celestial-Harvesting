@@ -1,0 +1,27 @@
+{
+  "name": "Golden Dune Sea",
+  "icon": "planet3",
+  "travel": 45,
+  "fuel": 950,
+  "damage": 14,
+  "rewards": [
+    {
+      "item": "minecraft:sandstone",
+      "count": 64
+    },
+    {
+      "item": "minecraft:sand",
+      "count": 64
+    },
+    {
+      "item": "minecraft:raw_gold",
+      "count": 12,
+      "chance": 0.7
+    },
+    {
+      "item": "minecraft:honeycomb_block",
+      "count": 8,
+      "chance": 0.2
+    }
+  ]
+}

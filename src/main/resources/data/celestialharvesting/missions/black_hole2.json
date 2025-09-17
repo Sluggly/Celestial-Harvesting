@@ -1,0 +1,28 @@
+{
+  "name": "Accretion Siphon",
+  "icon": "black_hole2",
+  "tier": 3,
+  "travel": 400,
+  "fuel": 30000,
+  "damage": 85,
+  "rewards": [
+    {
+      "item": "minecraft:glowstone",
+      "count": 64
+    },
+    {
+      "item": "minecraft:amethyst_block",
+      "count": 16
+    },
+    {
+      "item": "minecraft:beacon",
+      "count": 1,
+      "chance": 0.2
+    },
+    {
+      "item": "minecraft:elytra",
+      "count": 1,
+      "chance": 0.02
+    }
+  ]
+}

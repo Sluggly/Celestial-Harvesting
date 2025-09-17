@@ -1,0 +1,28 @@
+{
+  "name": "Quasar",
+  "icon": "quasar",
+  "tier": 3,
+  "travel": 300,
+  "fuel": 28000,
+  "damage": 90,
+  "rewards": [
+    {
+      "item": "minecraft:crying_obsidian",
+      "count": 32
+    },
+    {
+      "item": "minecraft:purpur_block",
+      "count": 64
+    },
+    {
+      "item": "minecraft:heart_of_the_sea",
+      "count": 1,
+      "chance": 0.15
+    },
+    {
+      "item": "minecraft:netherite_block",
+      "count": 1,
+      "chance": 0.03
+    }
+  ]
+}

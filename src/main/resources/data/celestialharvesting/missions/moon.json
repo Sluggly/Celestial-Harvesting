@@ -1,0 +1,27 @@
+{
+  "name": "Regolith Moon",
+  "icon": "moon",
+  "travel": 30,
+  "fuel": 700,
+  "damage": 6,
+  "rewards": [
+    {
+      "item": "minecraft:andesite",
+      "count": 64
+    },
+    {
+      "item": "minecraft:sand",
+      "count": 48
+    },
+    {
+      "item": "minecraft:raw_gold",
+      "count": 10,
+      "chance": 0.6
+    },
+    {
+      "item": "minecraft:calcite",
+      "count": 16,
+      "chance": 0.2
+    }
+  ]
+}

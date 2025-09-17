@@ -1,0 +1,28 @@
+{
+  "name": "Mercury",
+  "icon": "mercury",
+  "tier": 2,
+  "travel": 90,
+  "fuel": 4200,
+  "damage": 35,
+  "rewards": [
+    {
+      "item": "minecraft:cobbled_deepslate",
+      "count": 64
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 48
+    },
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 12,
+      "chance": 0.6
+    },
+    {
+      "item": "minecraft:rib_armor_trim_smithing_template",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

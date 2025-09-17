@@ -1,0 +1,29 @@
+{
+  "name": "Event Horizon Skim",
+  "icon": "black_hole",
+  "tier": 3,
+  "travel": 350,
+  "fuel": 25000,
+  "damage": 95,
+  "rewards": [
+    {
+      "item": "minecraft:netherite_scrap",
+      "count": 4
+    },
+    {
+      "item": "minecraft:echo_shard",
+      "count": 2,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:nether_star",
+      "count": 1,
+      "chance": 0.1
+    },
+    {
+      "item": "minecraft:dragon_egg",
+      "count": 1,
+      "chance": 0.01
+    }
+  ]
+}

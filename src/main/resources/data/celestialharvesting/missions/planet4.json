@@ -1,0 +1,28 @@
+{
+  "name": "Jovian Tempest",
+  "icon": "planet4",
+  "tier": 2,
+  "travel": 110,
+  "fuel": 4800,
+  "damage": 45,
+  "rewards": [
+    {
+      "item": "minecraft:packed_mud",
+      "count": 48
+    },
+    {
+      "item": "minecraft:dripstone_block",
+      "count": 32
+    },
+    {
+      "item": "minecraft:gunpowder",
+      "count": 24,
+      "chance": 0.7
+    },
+    {
+      "item": "minecraft:nautilus_shell",
+      "count": 1,
+      "chance": 0.1
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Intergalactic Expedition",
+  "icon": "image",
+  "tier": 3,
+  "travel": 600,
+  "fuel": 50000,
+  "damage": 90,
+  "rewards": [
+    {
+      "item": "minecraft:diamond_block",
+      "count": 2
+    },
+    {
+      "item": "minecraft:amethyst_block",
+      "count": 8
+    },
+    {
+      "item": "minecraft:shulker_shell",
+      "count": 4,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:netherite_upgrade_smithing_template",
+      "count": 1,
+      "chance": 0.1
+    }
+  ]
+}

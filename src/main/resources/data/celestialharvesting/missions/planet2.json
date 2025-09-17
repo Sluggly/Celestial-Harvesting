@@ -1,0 +1,28 @@
+{
+  "name": "Abyssal Gas Giant",
+  "icon": "planet2",
+  "tier": 2,
+  "travel": 100,
+  "fuel": 4500,
+  "damage": 40,
+  "rewards": [
+    {
+      "item": "minecraft:lapis_lazuli",
+      "count": 64
+    },
+    {
+      "item": "minecraft:prismarine_shards",
+      "count": 32
+    },
+    {
+      "item": "minecraft:blue_ice",
+      "count": 16,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:trident",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

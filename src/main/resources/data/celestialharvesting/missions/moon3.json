@@ -1,0 +1,27 @@
+{
+  "name": "Arid Moon",
+  "icon": "moon3",
+  "travel": 50,
+  "fuel": 1000,
+  "damage": 15,
+  "rewards": [
+    {
+      "item": "minecraft:red_sand",
+      "count": 64
+    },
+    {
+      "item": "minecraft:raw_iron",
+      "count": 32
+    },
+    {
+      "item": "minecraft:redstone",
+      "count": 24,
+      "chance": 0.75
+    },
+    {
+      "item": "minecraft:terracotta",
+      "count": 16,
+      "chance": 0.3
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Metallic Asteroid",
+  "icon": "asteroid3",
+  "travel": 40,
+  "fuel": 900,
+  "damage": 12,
+  "rewards": [
+    {
+      "item": "minecraft:raw_copper",
+      "count": 40
+    },
+    {
+      "item": "minecraft:tuff",
+      "count": 50
+    },
+    {
+      "item": "minecraft:raw_copper_block",
+      "count": 2,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "count": 16,
+      "chance": 0.2
+    }
+  ]
+}

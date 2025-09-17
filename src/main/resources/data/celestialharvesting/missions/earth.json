@@ -1,0 +1,26 @@
+{
+  "name": "Earth",
+  "icon": "earth",
+  "travel": 70,
+  "fuel": 3500,
+  "damage": 30,
+  "rewards": [
+    {
+      "item": "minecraft:oak_log",
+      "count": 64
+    },
+    {
+      "item": "minecraft:podzol",
+      "count": 32
+    },
+    {
+      "item": "minecraft:potato",
+      "count": 24
+    },
+    {
+      "item": "minecraft:bee_nest",
+      "count": 1,
+      "chance": 0.15
+    }
+  ]
+}

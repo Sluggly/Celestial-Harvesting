@@ -1,18 +1,26 @@
 {
-  "name": "Test Planet",
-  "icon": "test_icon",
-  "travel": 3,
-  "fuel": 0,
-  "damage": 10,
+  "name": "Scoriaceous Asteroid",
+  "icon": "asteroid",
+  "travel": 25,
+  "fuel": 600,
+  "damage": 8,
   "rewards": [
     {
-      "count": 16,
-      "item": "minecraft:diamond",
-	  "chance": 0.25
+      "item": "minecraft:coal",
+      "count": 64
     },
     {
-      "count": 32,
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:raw_iron",
+      "count": 24
+    },
+    {
+      "item": "minecraft:blackstone",
+      "count": 48
+    },
+    {
+      "item": "minecraft:obsidian",
+      "count": 8,
+      "chance": 0.25
     }
   ]
 }

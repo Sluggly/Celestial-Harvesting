@@ -1,0 +1,28 @@
+{
+  "name": "Jupiter",
+  "icon": "jupiter",
+  "tier": 2,
+  "travel": 100,
+  "fuel": 4500,
+  "damage": 40,
+  "rewards": [
+    {
+      "item": "minecraft:calcite",
+      "count": 48
+    },
+    {
+      "item": "minecraft:terracotta",
+      "count": 64
+    },
+    {
+      "item": "minecraft:gunpowder",
+      "count": 32,
+      "chance": 0.7
+    },
+    {
+      "item": "minecraft:ghast_tear",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

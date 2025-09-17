@@ -1,0 +1,28 @@
+{
+  "name": "Eye of the Tempest",
+  "icon": "jupiter2",
+  "tier": 3,
+  "travel": 250,
+  "fuel": 22000,
+  "damage": 85,
+  "rewards": [
+    {
+      "item": "minecraft:red_nether_bricks",
+      "count": 64
+    },
+    {
+      "item": "minecraft:nether_wart_block",
+      "count": 32
+    },
+    {
+      "item": "minecraft:experience_bottle",
+      "count": 32,
+      "chance": 0.4
+    },
+    {
+      "item": "minecraft:eye_armor_trim_smithing_template",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

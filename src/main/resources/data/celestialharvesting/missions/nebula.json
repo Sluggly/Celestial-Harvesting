@@ -1,0 +1,28 @@
+{
+  "name": "The Ashen Nebula",
+  "icon": "nebula",
+  "tier": 2,
+  "travel": 120,
+  "fuel": 5000,
+  "damage": 35,
+  "rewards": [
+    {
+      "item": "minecraft:magma_block",
+      "count": 64
+    },
+    {
+      "item": "minecraft:glowstone",
+      "count": 32
+    },
+    {
+      "item": "minecraft:blaze_powder",
+      "count": 16,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:crying_obsidian",
+      "count": 8,
+      "chance": 0.1
+    }
+  ]
+}

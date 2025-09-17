@@ -1,0 +1,28 @@
+{
+  "name": "Sun",
+  "icon": "sun",
+  "tier": 3,
+  "travel": 280,
+  "fuel": 26000,
+  "damage": 95,
+  "rewards": [
+    {
+      "item": "minecraft:glowstone",
+      "count": 64
+    },
+    {
+      "item": "minecraft:magma_block",
+      "count": 64
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "count": 16,
+      "chance": 0.6
+    },
+    {
+      "item": "minecraft:totem_of_undying",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

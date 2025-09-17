@@ -1,0 +1,29 @@
+{
+  "name": "Blood Star",
+  "icon": "sun2",
+  "tier": 3,
+  "travel": 260,
+  "fuel": 28000,
+  "damage": 99,
+  "rewards": [
+    {
+      "item": "minecraft:ancient_debris",
+      "count": 2
+    },
+    {
+      "item": "minecraft:netherite_scrap",
+      "count": 4,
+      "chance": 0.5
+    },
+    {
+      "item": "minecraft:wither_skeleton_skull",
+      "count": 1,
+      "chance": 0.1
+    },
+    {
+      "item": "minecraft:netherite_upgrade_smithing_template",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Saturn",
+  "icon": saturn",
+  "tier": 2,
+  "travel": 110,
+  "fuel": 4600,
+  "damage": 38,
+  "rewards": [
+    {
+      "item": "minecraft:packed_ice",
+      "count": 64
+    },
+    {
+      "item": "minecraft:calcite",
+      "count": 32
+    },
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 24,
+      "chance": 0.6
+    },
+    {
+      "item": "minecraft:snout_armor_trim_smithing_template",
+      "count": 1,
+      "chance": 0.05
+    }
+  ]
+}
