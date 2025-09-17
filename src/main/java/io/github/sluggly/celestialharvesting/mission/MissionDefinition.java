@@ -2,6 +2,7 @@ package io.github.sluggly.celestialharvesting.mission;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.ExtraCodecs;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,8 @@ public record MissionDefinition(
         int fuel,
         Optional<List<String>> module,
         int damage,
-        List<MissionItem> rewards
+        List<MissionItem> rewards,
+        Optional<Integer> tier
 ) {
     public static final Codec<MissionDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(MissionDefinition::name),
@@ -22,6 +24,7 @@ public record MissionDefinition(
             Codec.INT.fieldOf("fuel").forGetter(MissionDefinition::fuel),
             Codec.STRING.listOf().optionalFieldOf("module").forGetter(MissionDefinition::module),
             Codec.INT.fieldOf("damage").forGetter(MissionDefinition::damage),
-            MissionItem.CODEC.listOf().fieldOf("rewards").forGetter(MissionDefinition::rewards)
+            MissionItem.CODEC.listOf().fieldOf("rewards").forGetter(MissionDefinition::rewards),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("tier").forGetter(MissionDefinition::tier)
     ).apply(instance, MissionDefinition::new));
 }

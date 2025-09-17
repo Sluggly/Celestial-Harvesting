@@ -1,5 +1,6 @@
 package io.github.sluggly.celestialharvesting.client.screen;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.client.screen.widget.ItemListTooltipData;
@@ -12,18 +13,20 @@ import io.github.sluggly.celestialharvesting.network.CtoSPacket;
 import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.io.InputStream;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 
 public class MissionSelectionScreen extends Screen {
     private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(CelestialHarvesting.MOD_ID, "textures/gui/space_background.png");
@@ -31,11 +34,10 @@ public class MissionSelectionScreen extends Screen {
     private final Harvester harvester;
     private final HarvesterData harvesterData;
 
-    private static final int PLANET_TEXTURE_WIDTH = 64;
-    private static final int PLANET_TEXTURE_HEIGHT = 64;
     private static final int SAFE_ZONE_PADDING = 10;
     private List<MissionDisplayInfo> missionDisplayInfos;
     private record MissionDisplayInfo(Mission mission, int x, int y) {}
+    private static final Map<ResourceLocation, Point> textureDimensionCache = new HashMap<>();
 
     public MissionSelectionScreen(Harvester harvester) {
         super(Component.literal("Mission Selection"));
@@ -51,9 +53,10 @@ public class MissionSelectionScreen extends Screen {
 
         if (this.missionDisplayInfos != null) {
             for (MissionDisplayInfo info : this.missionDisplayInfos) {
-                addRenderableWidget(new PlanetButton(info.x(), info.y(), PLANET_TEXTURE_WIDTH, PLANET_TEXTURE_HEIGHT, info.mission(),
+                Point dimensions = getTextureDimensions(info.mission().getIcon());
+                addRenderableWidget(new PlanetButton(info.x(), info.y(), dimensions.x, dimensions.y, info.mission(),
                         (button) -> {
-                            if (this.harvester.getEnergyStored() >= info.mission().getFuelCost()) {
+                            if (this.harvester.getEnergyStored() >= info.mission().getFuelCost() && this.harvester.getHarvesterData().getTier() >= info.mission().getRequiredTier()) {
                                 CompoundTag data = new CompoundTag();
                                 data.putLong(NBTKeys.BLOCK_POS, this.harvester.getBlockPos().asLong());
                                 data.putString(NBTKeys.HARVESTER_ACTIVE_MISSION_ID, info.mission().getId().toString());
@@ -61,9 +64,7 @@ public class MissionSelectionScreen extends Screen {
                                 assert this.minecraft != null;
                                 this.minecraft.setScreen(null);
                             }
-                            else {
-                                System.out.println("Not enough energy!");
-                            }
+                            else { System.out.println("Cannot start mission: Requirements not met (Fuel or Tier)."); }
                         }));
             }
         }
@@ -87,11 +88,14 @@ public class MissionSelectionScreen extends Screen {
     private void renderMissionTooltip(GuiGraphics pGuiGraphics, Mission mission, int pMouseX, int pMouseY) {
         List<Component> textLines = new ArrayList<>();
 
-        // Add Title
         textLines.add(Component.literal(mission.getName()).withStyle(ChatFormatting.BOLD, ChatFormatting.AQUA));
         textLines.add(Component.literal("")); // Spacer
 
-        // Add Fuel Cost
+        int requiredTier = mission.getRequiredTier();
+        ChatFormatting tierColor = (harvesterData.getTier() >= requiredTier) ? ChatFormatting.GRAY : ChatFormatting.RED;
+        textLines.add(Component.literal("Tier Required: ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal("Tier " + requiredTier).withStyle(tierColor)));
+
         int fuelCost = mission.getFuelCost();
         int currentFuel = this.harvester.getEnergyStored();
         ChatFormatting fuelColor = (currentFuel >= fuelCost) ? ChatFormatting.GRAY : ChatFormatting.RED;
@@ -126,7 +130,6 @@ public class MissionSelectionScreen extends Screen {
     public boolean isPauseScreen() { return false; }
 
     private void calculateMissionPositions() {
-
         List<Mission> missionsToDisplay = MissionManager.getInstance().getAllMissions().entrySet().stream()
                 .map(entry -> new Mission(entry.getKey(), entry.getValue()))
                 .toList();
@@ -137,17 +140,14 @@ public class MissionSelectionScreen extends Screen {
         }
 
         Random random = new Random(this.harvesterData.getSeed());
-
         int missionCount = missionsToDisplay.size();
-
         int cols = (int) Math.ceil(Math.sqrt(missionCount));
         int rows = (int) Math.ceil((double) missionCount / cols);
 
         if (this.width > this.height) {
             cols = Math.max(rows, cols);
             rows = (int) Math.ceil((double) missionCount / cols);
-        }
-        else {
+        } else {
             rows = Math.max(rows, cols);
             cols = (int) Math.ceil((double) missionCount / rows);
         }
@@ -158,6 +158,7 @@ public class MissionSelectionScreen extends Screen {
         this.missionDisplayInfos = new ArrayList<>();
         for (int i = 0; i < missionCount; i++) {
             Mission mission = missionsToDisplay.get(i);
+            Point dimensions = getTextureDimensions(mission.getIcon());
 
             int gridRow = i / cols;
             int gridCol = i % cols;
@@ -165,8 +166,8 @@ public class MissionSelectionScreen extends Screen {
             int cellX = SAFE_ZONE_PADDING + gridCol * cellWidth;
             int cellY = SAFE_ZONE_PADDING + gridRow * cellHeight;
 
-            int xJitterRange = cellWidth - PLANET_TEXTURE_WIDTH;
-            int yJitterRange = cellHeight - PLANET_TEXTURE_HEIGHT;
+            int xJitterRange = cellWidth - dimensions.x;
+            int yJitterRange = cellHeight - dimensions.y;
 
             int xJitter = (xJitterRange > 0) ? random.nextInt(xJitterRange) : 0;
             int yJitter = (yJitterRange > 0) ? random.nextInt(yJitterRange) : 0;
@@ -175,6 +176,26 @@ public class MissionSelectionScreen extends Screen {
             int finalY = cellY + yJitter;
 
             this.missionDisplayInfos.add(new MissionDisplayInfo(mission, finalX, finalY));
+        }
+    }
+
+    private Point getTextureDimensions(ResourceLocation textureRL) {
+        if (textureDimensionCache.containsKey(textureRL)) { return textureDimensionCache.get(textureRL); }
+
+        try {
+            Resource resource = Minecraft.getInstance().getResourceManager().getResourceOrThrow(textureRL);
+            try (InputStream inputStream = resource.open()) {
+                NativeImage image = NativeImage.read(inputStream);
+                Point dimensions = new Point(image.getWidth(), image.getHeight());
+                textureDimensionCache.put(textureRL, dimensions);
+                image.close();
+                return dimensions;
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to read texture dimensions for: " + textureRL + ". Defaulting to 64x64.");
+            Point defaultDimensions = new Point(64, 64);
+            textureDimensionCache.put(textureRL, defaultDimensions);
+            return defaultDimensions;
         }
     }
 }

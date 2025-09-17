@@ -1,0 +1,19 @@
+{
+  "name": "Tier 2 Hyperdrive",
+  "row": 0,
+  "column": 4,
+  "description": "Unlocks the ability to travel to Tier 2 destinations.",
+  "icon": "minecraft:nether_star",
+  "cost": [
+    {
+      "count": 1,
+      "item": "minecraft:nether_star"
+    },
+    {
+      "count": 4,
+      "item": "minecraft:diamond_block"
+    }
+  ],
+  "requirements": [],
+  "grantsTier": 2
+}

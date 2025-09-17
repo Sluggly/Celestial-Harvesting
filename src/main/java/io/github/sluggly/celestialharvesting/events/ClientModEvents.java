@@ -2,6 +2,7 @@ package io.github.sluggly.celestialharvesting.events;
 
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.client.model.HarvesterModel;
+import io.github.sluggly.celestialharvesting.client.model.LandingPadModel;
 import io.github.sluggly.celestialharvesting.client.renderer.HarvesterRenderer;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryScreen;
 import io.github.sluggly.celestialharvesting.client.screen.widget.ItemListTooltipComponent;
@@ -36,5 +37,6 @@ public class ClientModEvents {
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(HarvesterModel.LAYER_LOCATION, HarvesterModel::createBodyLayer);
+        event.registerLayerDefinition(LandingPadModel.LAYER_LOCATION, LandingPadModel::createBodyLayer);
     }
 }

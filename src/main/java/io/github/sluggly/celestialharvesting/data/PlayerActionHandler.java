@@ -91,6 +91,12 @@ public class PlayerActionHandler {
                             Utils.removeItemInInventory(item.item().asItem(), item.count(), player);
                         }
 
+                        def.grantsTier().ifPresent(newTier -> {
+                            if (newTier > harvester.getHarvesterData().getTier()) {
+                                harvester.getHarvesterData().setTier(newTier);
+                            }
+                        });
+
                         harvester.getHarvesterData().addUpgrade(upgradeId);
                         harvester.setChanged();
 
