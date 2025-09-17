@@ -20,7 +20,8 @@ public record UpgradeDefinition(
         List<String> requirements,
         Optional<Integer> grantsTier,
         Optional<Float> speed_modifier,
-        Optional<Float> fuel_modifier
+        Optional<Float> fuel_modifier,
+        Optional<Float> damage_negation_chance
 ) {
     public static final Codec<UpgradeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(UpgradeDefinition::name),
@@ -32,6 +33,7 @@ public record UpgradeDefinition(
             Codec.STRING.listOf().optionalFieldOf("requirements", List.of()).forGetter(UpgradeDefinition::requirements),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("grantsTier").forGetter(UpgradeDefinition::grantsTier),
             Codec.FLOAT.optionalFieldOf("speed_modifier").forGetter(UpgradeDefinition::speed_modifier),
-            Codec.FLOAT.optionalFieldOf("fuel_modifier").forGetter(UpgradeDefinition::fuel_modifier)
+            Codec.FLOAT.optionalFieldOf("fuel_modifier").forGetter(UpgradeDefinition::fuel_modifier),
+            Codec.FLOAT.optionalFieldOf("damage_negation_chance").forGetter(UpgradeDefinition::damage_negation_chance)
     ).apply(instance, UpgradeDefinition::new));
 }

@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Deflector Shield",
+  "row": 3,
+  "column": 6,
+  "description": "A powerful energy shield envelops the harvester, making it completely immune to all mission hazards.",
+  "icon": "minecraft:netherite_block",
+  "cost": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 4
+    },
+    {
+      "item": "minecraft:beacon",
+      "count": 1
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:shield_upgrade_2"
+  ],
+  "damage_negation_chance": 1.0
+}

@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Hull Plating",
+  "row": 1,
+  "column": 6,
+  "description": "Reinforced iron plating gives the harvester a chance to completely resist damage from minor hazards.",
+  "icon": "minecraft:iron_block",
+  "cost": [
+    {
+      "item": "minecraft:iron_ingot",
+      "count": 64
+    },
+    {
+      "item": "minecraft:obsidian",
+      "count": 16
+    }
+  ],
+  "requirements": [],
+  "damage_negation_chance": 0.25
+}

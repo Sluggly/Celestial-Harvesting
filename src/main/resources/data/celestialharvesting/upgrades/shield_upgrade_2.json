@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Ablative Armor",
+  "row": 2,
+  "column": 6,
+  "description": "Layers of diamond-laced armor ablate upon impact, providing a significant chance to negate all damage.",
+  "icon": "minecraft:diamond_block",
+  "cost": [
+    {
+      "item": "minecraft:diamond",
+      "count": 16
+    },
+    {
+      "item": "minecraft:crying_obsidian",
+      "count": 8
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:shield_upgrade_1"
+  ],
+  "damage_negation_chance": 0.5
+}

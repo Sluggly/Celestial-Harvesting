@@ -82,6 +82,13 @@ public class UpgradeData {
                         .withStyle(Style.EMPTY.withColor(0xFFD700)));
             });
 
+            info.def.damage_negation_chance().ifPresent(chance -> {
+                int percentage = (int) (chance * 100);
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal(percentage + "% chance to negate all mission damage")
+                        .withStyle(Style.EMPTY.withColor(0x55FF55)));
+            });
+
             if (info.isUnlocked) {
                 textLines.add(Component.literal("")); // Spacer
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));

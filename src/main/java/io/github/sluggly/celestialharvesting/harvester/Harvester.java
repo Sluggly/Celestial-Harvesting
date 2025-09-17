@@ -251,8 +251,13 @@ public class Harvester extends BlockEntity implements MenuProvider {
         Mission mission = Mission.getMissionFromId(new ResourceLocation(missionIdStr));
         if (mission == null) return;
 
+        float negationChance = this.getDamageNegationChance();
+        int damageToApply = mission.getDamage();
+
+        if (this.random.nextFloat() < negationChance) { damageToApply = 0; }
+
         int currentHealth = this.harvesterData.getCurrentHealth();
-        this.harvesterData.setCurrentHealth(currentHealth - mission.getDamage());
+        this.harvesterData.setCurrentHealth(currentHealth - damageToApply);
 
         if (this.harvesterData.getCurrentHealth() <= 0) {
             for (int i = 0; i < this.itemHandler.getSlots(); i++) { this.itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
@@ -349,6 +354,23 @@ public class Harvester extends BlockEntity implements MenuProvider {
         }
 
         return (int) (baseFuelCost * bestModifier);
+    }
+
+    public float getDamageNegationChance() {
+        float bestChance = 0.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.damage_negation_chance().isPresent()) {
+                if (def.damage_negation_chance().get() > bestChance) {
+                    bestChance = def.damage_negation_chance().get();
+                }
+            }
+        }
+        return bestChance;
     }
 
 
