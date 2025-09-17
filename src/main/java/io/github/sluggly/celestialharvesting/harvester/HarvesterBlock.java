@@ -22,9 +22,13 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,13 +47,17 @@ public class HarvesterBlock extends BaseEntityBlock {
     }
     public static final EnumProperty<State> STATE = EnumProperty.create("state", State.class);
 
+    public static final BooleanProperty UPGRADED = BooleanProperty.create("upgraded");
+    protected static final VoxelShape SLAB_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
+    protected static final VoxelShape CARPET_SHAPE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D);
+
     public HarvesterBlock(Properties pProperties) {
         super(pProperties.pushReaction(PushReaction.BLOCK));
-        this.registerDefaultState(this.stateDefinition.any().setValue(STATE, State.IDLE));
+        this.registerDefaultState(this.stateDefinition.any().setValue(STATE, State.IDLE).setValue(UPGRADED, Boolean.FALSE));
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) { pBuilder.add(STATE); }
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) { pBuilder.add(STATE, UPGRADED); }
 
     @Nullable
     @Override
@@ -82,8 +90,16 @@ public class HarvesterBlock extends BaseEntityBlock {
 
     @Override
     @SuppressWarnings("deprecation")
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) { return RenderShape.ENTITYBLOCK_ANIMATED; }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
+
+        if (pState.getValue(STATE) == State.IN_MISSION) { return CARPET_SHAPE; }
+
+        if (pState.getValue(UPGRADED)) { return Shapes.block(); }
+        else { return SLAB_SHAPE; }
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.github.sluggly.celestialharvesting.data;
 import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryMenu;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
+import io.github.sluggly.celestialharvesting.harvester.HarvesterBlock;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
@@ -17,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,6 +93,11 @@ public class PlayerActionHandler {
 
                         harvester.getHarvesterData().addUpgrade(upgradeId);
                         harvester.setChanged();
+
+                        BlockState currentState = player.level().getBlockState(pos);
+                        if (!currentState.getValue(HarvesterBlock.UPGRADED)) {
+                            player.level().setBlock(pos, currentState.setValue(HarvesterBlock.UPGRADED, true), 3);
+                        }
 
                         CompoundTag payload = new CompoundTag();
                         payload.put("HarvesterData", harvester.getHarvesterData().dataTag);

@@ -1,5 +1,5 @@
 {
   "textures": {
-    "particle": "celestialharvesting:entity/harvester"
+    "particle": "minecraft:block/smithing_table_top"
   }
 }

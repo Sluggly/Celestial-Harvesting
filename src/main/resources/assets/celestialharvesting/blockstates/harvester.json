@@ -1,10 +1,8 @@
 {
   "variants": {
-    "state=IDLE": {
-      "model": "celestialharvesting:block/harvester"
-    },
-    "state=IN_MISSION": {
-      "model": "celestialharvesting:block/harvester"
-    }
+    "state=idle,upgraded=false": { "model": "celestialharvesting:block/harvester" },
+    "state=idle,upgraded=true": { "model": "celestialharvesting:block/harvester" },
+    "state=in_mission,upgraded=false": { "model": "celestialharvesting:block/harvester" },
+    "state=in_mission,upgraded=true": { "model": "celestialharvesting:block/harvester" }
   }
 }

@@ -98,7 +98,6 @@ public class Harvester extends BlockEntity implements MenuProvider {
             if (pBlockEntity.animationTick >= ANIMATION_DURATION) {
                 pBlockEntity.animationState = AnimationState.NONE;
                 pBlockEntity.getHarvesterData().setStatus(NBTKeys.HARVESTER_ONGOING);
-                pLevel.setBlock(pPos, pState.setValue(HarvesterBlock.STATE, HarvesterBlock.State.IN_MISSION), 3);
             }
             pBlockEntity.setChanged();
             return;
@@ -218,6 +217,11 @@ public class Harvester extends BlockEntity implements MenuProvider {
 
             this.animationState = AnimationState.TAKING_OFF;
             this.animationTick = 0;
+
+            BlockState currentState = this.level.getBlockState(this.worldPosition);
+            if (currentState.is(this.getBlockState().getBlock())) {
+                this.level.setBlock(this.worldPosition, currentState.setValue(HarvesterBlock.STATE, HarvesterBlock.State.IN_MISSION), 3);
+            }
 
             setChanged();
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
