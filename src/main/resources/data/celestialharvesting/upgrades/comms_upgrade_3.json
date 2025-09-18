@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Ansible",
+  "row": 3,
+  "column": 8,
+  "description": "This device uses quantum entanglement for instantaneous communication, revealing a vast number of mission possibilities.",
+  "icon": "minecraft:sculk_shrieker",
+  "cost": [
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 1
+    },
+    {
+      "item": "minecraft:trident",
+      "count": 1
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:comms_upgrade_2"
+  ],
+  "mission_bonus": 3
+}

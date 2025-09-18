@@ -1,12 +1,9 @@
 package io.github.sluggly.celestialharvesting.harvester;
 
-import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
-import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
-import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -37,21 +34,12 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 
 public class Harvester extends BlockEntity implements MenuProvider {
     private HarvesterData harvesterData = new HarvesterData(null);
-    private static final int INVENTORY_SIZE = 54;
     private boolean isInternalModification = false;
-    private final ItemStackHandler itemHandler = new ItemStackHandler(INVENTORY_SIZE) {
-        @Override
-        protected void onContentsChanged(int slot) { setChanged(); }
-        @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) { return isInternalModification; }
-    };
+    private ItemStackHandler itemHandler;
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     public ItemStackHandler getItemHandler() { return this.itemHandler; }
 
@@ -70,7 +58,19 @@ public class Harvester extends BlockEntity implements MenuProvider {
     };
     private LazyOptional<IEnergyStorage> lazyEnergyHandler = LazyOptional.empty();
 
-    public Harvester(BlockPos pPos, BlockState pBlockState) { super(BlockEntityInit.HARVESTER.get(), pPos, pBlockState); }
+    public Harvester(BlockPos pPos, BlockState pBlockState) {
+        super(BlockEntityInit.HARVESTER.get(), pPos, pBlockState);
+        this.itemHandler = createItemHandler(1);
+    }
+
+    private ItemStackHandler createItemHandler(int rows) {
+        return new ItemStackHandler(rows * 9) {
+            @Override
+            protected void onContentsChanged(int slot) { setChanged(); }
+            @Override
+            public boolean isItemValid(int slot, @NotNull ItemStack stack) { return isInternalModification; }
+        };
+    }
 
     @Override
     public @NotNull Component getDisplayName() { return Component.translatable("block.celestialharvesting.harvester"); }
@@ -124,7 +124,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
             else if (timeLeft % 20 == 0) { pBlockEntity.setChanged(); }
         }
         else {
-            int solarRate = pBlockEntity.getSolarGenerationRate();
+            int solarRate = pBlockEntity.harvesterData.getSolarGenerationRate();
             if (solarRate > 0) {
                 if (pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
                     if (pLevel.isDay() && pLevel.canSeeSky(pPos.above())) {
@@ -170,6 +170,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
         if (pTag.contains("HarvesterData")) { this.harvesterData = new HarvesterData(pTag.getCompound("HarvesterData")); }
+        this.itemHandler = createItemHandler(this.harvesterData.getInventoryRows());
         if (pTag.contains("inventory")) { itemHandler.deserializeNBT(pTag.getCompound("inventory")); }
         if (pTag.contains("energy", Tag.TAG_INT)) { energyStorage.deserializeNBT(pTag.get("energy")); }
         if (pTag.contains("animationState")) { animationState = AnimationState.values()[pTag.getInt("animationState")]; }
@@ -210,11 +211,11 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public void startMissionSequence(Mission mission) {
         if (this.level == null || this.level.isClientSide()) return;
 
-        int modifiedFuelCost = getModifiedFuelCost(mission.getFuelCost());
+        int modifiedFuelCost = this.harvesterData.getModifiedFuelCost(mission.getFuelCost());
         if (getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && getEnergyStored() >= modifiedFuelCost) {
             consumeEnergy(modifiedFuelCost);
             getHarvesterData().setActiveMissionID(mission.getId().toString());
-            getHarvesterData().setMissionTimeLeft(getModifiedMissionTime(mission.getTravelTime()));
+            getHarvesterData().setMissionTimeLeft(this.harvesterData.getModifiedMissionTime(mission.getTravelTime()));
 
             this.animationState = AnimationState.TAKING_OFF;
             this.animationTick = 0;
@@ -247,7 +248,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
         Mission mission = Mission.getMissionFromId(new ResourceLocation(missionIdStr));
         if (mission == null) return;
 
-        float negationChance = this.getDamageNegationChance();
+        float negationChance = this.harvesterData.getDamageNegationChance();
         int damageToApply = mission.getDamage();
 
         if (this.random.nextFloat() < negationChance) { damageToApply = 0; }
@@ -259,7 +260,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
             for (int i = 0; i < this.itemHandler.getSlots(); i++) { this.itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
         }
         else {
-            int totalRolls = 1 + this.getLootRerollCount();
+            int totalRolls = 1 + this.harvesterData.getLootRerollCount();
             for (int i = 0; i < totalRolls; i++) {
                 try {
                     this.isInternalModification = true;
@@ -322,84 +323,24 @@ public class Harvester extends BlockEntity implements MenuProvider {
         }
     }
 
-    public int getModifiedMissionTime(int baseTravelTimeInSeconds) {
-        if (this.level == null || this.level.isClientSide()) { return baseTravelTimeInSeconds * 20; }
+    public void applyInventoryUpgrade(int bonusRows) {
+        if (this.level == null || this.level.isClientSide()) return;
 
-        float bestModifier = 1.0f;
+        int currentRows = this.harvesterData.getInventoryRows();
+        int newRows = Math.min(6, currentRows + bonusRows);
+        if (newRows <= currentRows) return;
 
-        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        ItemStackHandler newHandler = createItemHandler(newRows);
 
-        for (ResourceLocation upgradeId : unlockedUpgrades) {
-            UpgradeDefinition def = UpgradeManager.getInstance().getAllUpgrades().get(upgradeId);
-            if (def != null && def.speed_modifier().isPresent()) {
-                if (def.speed_modifier().get() < bestModifier) { bestModifier = def.speed_modifier().get(); }
-            }
-        }
+        for (int i = 0; i < this.itemHandler.getSlots(); i++) { newHandler.setStackInSlot(i, this.itemHandler.getStackInSlot(i)); }
 
-        return (int) (baseTravelTimeInSeconds * bestModifier * 20);
-    }
+        this.itemHandler = newHandler;
+        this.harvesterData.setInventoryRows(newRows);
 
-    public int getModifiedFuelCost(int baseFuelCost) {
-        float bestModifier = 1.0f;
+        this.lazyItemHandler.invalidate();
+        this.lazyItemHandler = LazyOptional.of(() -> this.itemHandler);
 
-        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
-        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
-
-        for (ResourceLocation upgradeId : unlockedUpgrades) {
-            UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.fuel_modifier().isPresent()) {
-                if (def.fuel_modifier().get() < bestModifier) { bestModifier = def.fuel_modifier().get(); }
-            }
-        }
-
-        return (int) (baseFuelCost * bestModifier);
-    }
-
-    public float getDamageNegationChance() {
-        float bestChance = 0.0f;
-
-        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
-        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
-
-        for (ResourceLocation upgradeId : unlockedUpgrades) {
-            UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.damage_negation_chance().isPresent()) {
-                if (def.damage_negation_chance().get() > bestChance) {
-                    bestChance = def.damage_negation_chance().get();
-                }
-            }
-        }
-        return bestChance;
-    }
-
-    public int getLootRerollCount() {
-        int bestRerolls = 0;
-
-        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
-        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
-
-        for (ResourceLocation upgradeId : unlockedUpgrades) {
-            UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.loot_rerolls().isPresent()) {
-                if (def.loot_rerolls().get() > bestRerolls) { bestRerolls = def.loot_rerolls().get(); }
-            }
-        }
-        return bestRerolls;
-    }
-
-    public int getSolarGenerationRate() {
-        int bestRate = 0;
-
-        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
-        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
-
-        for (ResourceLocation upgradeId : unlockedUpgrades) {
-            UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.solar_generation().isPresent()) {
-                if (def.solar_generation().get() > bestRate) { bestRate = def.solar_generation().get(); }
-            }
-        }
-        return bestRate;
+        setChanged();
     }
 
 

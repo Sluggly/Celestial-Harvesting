@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Expanded Hold",
+  "row": 2,
+  "column": 2,
+  "description": "Adds another row of storage by optimizing internal component placement.",
+  "icon": "minecraft:shulker_box",
+  "cost": [
+    {
+      "item": "minecraft:diamond",
+      "count": 4
+    },
+    {
+      "item": "minecraft:shulker_shell",
+      "count": 2
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:inventory_upgrade_1"
+  ],
+  "inventory_rows": 1
+}

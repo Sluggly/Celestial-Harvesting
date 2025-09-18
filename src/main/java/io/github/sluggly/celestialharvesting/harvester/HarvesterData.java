@@ -2,6 +2,8 @@ package io.github.sluggly.celestialharvesting.harvester;
 
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,6 +28,7 @@ public class HarvesterData {
             this.dataTag.putString(HARVESTER_STATUS,HARVESTER_IDLE);
             this.dataTag.putInt(HARVESTER_MISSION_TIME_LEFT, 0);
             this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, "");
+            this.dataTag.putInt(HARVESTER_INVENTORY_ROWS, 1);
             this.dataTag.put(HARVESTER_UPGRADES, new ListTag());
             rerollMissions();
         }
@@ -40,14 +43,17 @@ public class HarvesterData {
     public void generateSeed() { this.dataTag.putInt(HARVESTER_SEED, Utils.generateSeed()); }
     public String getState() { return this.dataTag.getString(HARVESTER_STATUS); }
     public void setState(String state) { this.dataTag.putString(HARVESTER_STATUS,state); }
+    public int getInventoryRows() { return this.dataTag.contains(HARVESTER_INVENTORY_ROWS) ? this.dataTag.getInt(HARVESTER_INVENTORY_ROWS) : 1; }
+    public void setInventoryRows(int rows) { this.dataTag.putInt(HARVESTER_INVENTORY_ROWS, rows); }
 
     public int getNumberOfMissions(int seed) {
-        int minimum = 1;
-        int maximum = 3;
+        int bonus = this.getMissionCountBonus();
+        int minimum = 1 + bonus;
+        int maximum = 3 + bonus;
         Random random = new Random(seed);
-        int value = random.nextInt(maximum - minimum) + minimum;
-        return value;
+        return random.nextInt(maximum - minimum + 1) + minimum;
     }
+
     public int getTier() { return this.dataTag.getInt(HARVESTER_TIER); }
     public void setTier(int tier) { this.dataTag.putInt(HARVESTER_TIER, tier); }
 
@@ -131,6 +137,99 @@ public class HarvesterData {
             }
         }
         return missions;
+    }
+
+    public int getModifiedMissionTime(int baseTravelTimeInSeconds) {
+        float bestModifier = 1.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = UpgradeManager.getInstance().getAllUpgrades().get(upgradeId);
+            if (def != null && def.speed_modifier().isPresent()) {
+                if (def.speed_modifier().get() < bestModifier) { bestModifier = def.speed_modifier().get(); }
+            }
+        }
+
+        return (int) (baseTravelTimeInSeconds * bestModifier * 20);
+    }
+
+    public int getModifiedFuelCost(int baseFuelCost) {
+        float bestModifier = 1.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.fuel_modifier().isPresent()) {
+                if (def.fuel_modifier().get() < bestModifier) { bestModifier = def.fuel_modifier().get(); }
+            }
+        }
+
+        return (int) (baseFuelCost * bestModifier);
+    }
+
+    public float getDamageNegationChance() {
+        float bestChance = 0.0f;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.damage_negation_chance().isPresent()) {
+                if (def.damage_negation_chance().get() > bestChance) {
+                    bestChance = def.damage_negation_chance().get();
+                }
+            }
+        }
+        return bestChance;
+    }
+
+    public int getLootRerollCount() {
+        int bestRerolls = 0;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.loot_rerolls().isPresent()) {
+                if (def.loot_rerolls().get() > bestRerolls) { bestRerolls = def.loot_rerolls().get(); }
+            }
+        }
+        return bestRerolls;
+    }
+
+    public int getSolarGenerationRate() {
+        int bestRate = 0;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.solar_generation().isPresent()) {
+                if (def.solar_generation().get() > bestRate) { bestRate = def.solar_generation().get(); }
+            }
+        }
+        return bestRate;
+    }
+
+    private int getMissionCountBonus() {
+        int bestBonus = 0;
+
+        Set<ResourceLocation> unlockedUpgrades = this.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.mission_bonus().isPresent()) {
+                if (def.mission_bonus().get() > bestBonus) { bestBonus = def.mission_bonus().get(); }
+            }
+        }
+        return bestBonus;
     }
 
 }

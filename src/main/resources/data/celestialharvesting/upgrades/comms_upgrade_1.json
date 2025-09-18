@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Signal Booster",
+  "row": 1,
+  "column": 8,
+  "description": "Boosts the Harvester's signal strength, revealing more potential mission destinations.",
+  "icon": "minecraft:lightning_rod",
+  "cost": [
+    {
+      "item": "minecraft:raw_gold",
+      "count": 32
+    },
+    {
+      "item": "minecraft:raw_copper_block",
+      "count": 4
+    }
+  ],
+  "requirements": [],
+  "mission_bonus": 1
+}

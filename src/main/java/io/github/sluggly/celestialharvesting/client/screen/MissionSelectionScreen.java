@@ -8,7 +8,6 @@ import io.github.sluggly.celestialharvesting.client.screen.widget.PlanetButton;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
 import io.github.sluggly.celestialharvesting.mission.Mission;
-import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
 import io.github.sluggly.celestialharvesting.network.PacketHandler;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
@@ -56,7 +55,7 @@ public class MissionSelectionScreen extends Screen {
                 Point dimensions = getTextureDimensions(info.mission().getIcon());
                 addRenderableWidget(new PlanetButton(info.x(), info.y(), dimensions.x, dimensions.y, info.mission(),
                         (button) -> {
-                            int modifiedFuelCost = this.harvester.getModifiedFuelCost(info.mission().getFuelCost());
+                            int modifiedFuelCost = this.harvester.getHarvesterData().getModifiedFuelCost(info.mission().getFuelCost());
                             if (this.harvester.getEnergyStored() >= modifiedFuelCost && this.harvester.getHarvesterData().getTier() >= info.mission().getRequiredTier()) {
                                 CompoundTag data = new CompoundTag();
                                 data.putLong(NBTKeys.BLOCK_POS, this.harvester.getBlockPos().asLong());

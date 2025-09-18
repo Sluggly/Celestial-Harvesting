@@ -97,6 +97,8 @@ public class PlayerActionHandler {
                             }
                         });
 
+                        def.inventory_rows().ifPresent(harvester::applyInventoryUpgrade);
+
                         harvester.getHarvesterData().addUpgrade(upgradeId);
                         harvester.setChanged();
 

@@ -101,6 +101,12 @@ public class UpgradeData {
                         .withStyle(Style.EMPTY.withColor(0xFFFF55)));
             });
 
+            info.def.mission_bonus().ifPresent(bonus -> {
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal("+" + bonus + " Mission Slots")
+                        .withStyle(Style.EMPTY.withColor(0x5555FF)));
+            });
+
             if (info.isUnlocked) {
                 textLines.add(Component.literal(""));
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));

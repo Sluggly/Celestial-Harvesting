@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Cargo Bay",
+  "row": 1,
+  "column": 2,
+  "description": "Expands the internal storage, adding an extra row of inventory space.",
+  "icon": "minecraft:chest",
+  "cost": [
+    {
+      "item": "minecraft:piston",
+      "count": 4
+    },
+    {
+      "item": "minecraft:iron_block",
+      "count": 4
+    }
+  ],
+  "requirements": [],
+  "inventory_rows": 1
+}

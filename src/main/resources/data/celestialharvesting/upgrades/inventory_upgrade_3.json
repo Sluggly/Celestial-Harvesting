@@ -1,0 +1,22 @@
+{
+  "name": "III-Grade Pocket Dimension",
+  "row": 3,
+  "column": 2,
+  "description": "Integrates a small, stable pocket dimension, adding three more rows for a massive storage increase.",
+  "icon": "minecraft:ender_chest",
+  "cost": [
+    {
+      "item": "minecraft:nether_star",
+      "count": 1
+    },
+    {
+      "item": "minecraft:netherite_ingot",
+      "count": 2
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:inventory_upgrade_2"
+  ],
+  "inventory_rows": 3
+}

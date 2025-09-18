@@ -19,15 +19,25 @@ public class HarvesterInventoryMenu extends AbstractContainerMenu {
         super(MenuInit.HARVESTER_INVENTORY_MENU.get(), pContainerId);
         this.blockEntity = pBlockEntity;
 
-        // Harvester Inventory Slots (6 rows of 9)
-        for (int i = 0; i < 6; ++i) {
+        int harvesterRows = this.blockEntity.getHarvesterData().getInventoryRows();
+
+        for (int i = 0; i < harvesterRows; ++i) {
             for (int j = 0; j < 9; ++j) {
                 this.addSlot(new SlotItemHandler(this.blockEntity.getItemHandler(), j + i * 9, 8 + j * 18, 18 + i * 18));
             }
         }
 
-        addPlayerInventory(pPlayerInventory);
-        addPlayerHotbar(pPlayerInventory);
+        int playerInventoryY = 18 + harvesterRows * 18 + 14;
+
+        for (int i = 0; i < 3; ++i) {
+            for (int l = 0; l < 9; ++l) {
+                this.addSlot(new Slot(pPlayerInventory, l + i * 9 + 9, 8 + l * 18, playerInventoryY + i * 18));
+            }
+        }
+
+        for (int i = 0; i < 9; ++i) {
+            this.addSlot(new Slot(pPlayerInventory, i, 8 + i * 18, playerInventoryY + 58));
+        }
     }
 
     public HarvesterInventoryMenu(int pContainerId, Inventory pPlayerInventory, FriendlyByteBuf pExtraData) {
@@ -69,7 +79,7 @@ public class HarvesterInventoryMenu extends AbstractContainerMenu {
         ItemStack sourceStack = sourceSlot.getItem();
         ItemStack copyStack = sourceStack.copy();
 
-        int harvesterInvSize = 54;
+        int harvesterInvSize = this.blockEntity.getHarvesterData().getInventoryRows() * 9;
         int playerInvStart = harvesterInvSize;
         int playerInvEnd = this.slots.size();
 

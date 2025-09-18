@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Hyperwave Relay",
+  "row": 2,
+  "column": 8,
+  "description": "A powerful relay that can detect fainter mission signals from further away, significantly increasing options.",
+  "icon": "minecraft:conduit",
+  "cost": [
+    {
+      "item": "minecraft:diamond",
+      "count": 8
+    },
+    {
+      "item": "minecraft:prismarine_shards",
+      "count": 32
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:comms_upgrade_1"
+  ],
+  "mission_bonus": 2
+}

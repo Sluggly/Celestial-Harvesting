@@ -23,7 +23,9 @@ public record UpgradeDefinition(
         Optional<Float> fuel_modifier,
         Optional<Float> damage_negation_chance,
         Optional<Integer> loot_rerolls,
-        Optional<Integer> solar_generation
+        Optional<Integer> solar_generation,
+        Optional<Integer> mission_bonus,
+        Optional<Integer> inventory_rows
 ) {
     public static final Codec<UpgradeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(UpgradeDefinition::name),
@@ -38,6 +40,8 @@ public record UpgradeDefinition(
             Codec.FLOAT.optionalFieldOf("fuel_modifier").forGetter(UpgradeDefinition::fuel_modifier),
             Codec.FLOAT.optionalFieldOf("damage_negation_chance").forGetter(UpgradeDefinition::damage_negation_chance),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("loot_rerolls").forGetter(UpgradeDefinition::loot_rerolls),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("solar_generation").forGetter(UpgradeDefinition::solar_generation)
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("solar_generation").forGetter(UpgradeDefinition::solar_generation),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("mission_bonus").forGetter(UpgradeDefinition::mission_bonus),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("inventory_rows").forGetter(UpgradeDefinition::inventory_rows)
     ).apply(instance, UpgradeDefinition::new));
 }
