@@ -1,5 +1,6 @@
 package io.github.sluggly.celestialharvesting.harvester;
 
+import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
 import io.github.sluggly.celestialharvesting.mission.Mission;
@@ -15,6 +16,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -208,14 +210,18 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public AnimationState getAnimationState() { return this.animationState; }
     public int getAnimationTick() { return this.animationTick; }
 
-    public void startMissionSequence(Mission mission) {
+    public void startMissionSequence(Mission mission, ServerPlayer player) {
         if (this.level == null || this.level.isClientSide()) return;
 
         int modifiedFuelCost = this.harvesterData.getModifiedFuelCost(mission.getFuelCost());
         if (getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_IDLE) && getEnergyStored() >= modifiedFuelCost) {
             consumeEnergy(modifiedFuelCost);
             getHarvesterData().setActiveMissionID(mission.getId().toString());
-            getHarvesterData().setMissionTimeLeft(this.harvesterData.getModifiedMissionTime(mission.getTravelTime()));
+
+            int missionTime = this.harvesterData.getModifiedMissionTime(mission.getTravelTime());
+            if (Admin.arePlayerMissionsInstant(player)) { missionTime = 3; }
+
+            getHarvesterData().setMissionTimeLeft(missionTime);
 
             this.animationState = AnimationState.TAKING_OFF;
             this.animationTick = 0;

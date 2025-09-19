@@ -4,7 +4,6 @@ import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.MainScreen;
 import io.github.sluggly.celestialharvesting.client.screen.UpgradeScreen;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
-import io.github.sluggly.celestialharvesting.mission.MissionDefinition;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.network.StoCPacket;
 import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
@@ -12,13 +11,7 @@ import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ClientHooks {
     public static void handleActions(StoCPacket msg) {
@@ -35,6 +28,10 @@ public class ClientHooks {
             case "AdminNo" -> Admin.CLIENT_IS_ADMIN_MODE_ACTIVATED = false;
             case "AdminLog" -> Admin.ADMIN_SERVER_CONSOLE_LOG = true;
             case "AdminLogNo" -> Admin.ADMIN_SERVER_CONSOLE_LOG = false;
+            case "AdminInstant" -> Admin.CLIENT_ADMIN_MISSION_INSTANT = true;
+            case "AdminInstantNo" -> Admin.CLIENT_ADMIN_MISSION_INSTANT = false;
+            case "AdminItems" -> Admin.CLIENT_ADMIN_NO_ITEM_REQUIRED = true;
+            case "AdminItemsNo" -> Admin.CLIENT_ADMIN_NO_ITEM_REQUIRED = false;
         }
     }
 

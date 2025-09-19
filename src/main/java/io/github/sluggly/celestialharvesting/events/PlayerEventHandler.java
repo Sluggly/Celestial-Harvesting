@@ -1,10 +1,12 @@
 package io.github.sluggly.celestialharvesting.events;
 
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
+import io.github.sluggly.celestialharvesting.admin.AdminCommands;
 import io.github.sluggly.celestialharvesting.mission.MissionManager;
 import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -23,5 +25,10 @@ public class PlayerEventHandler {
             MissionManager.syncMissionsToClient(player);
             UpgradeManager.syncUpgradesToClient(player);
         }
+    }
+
+    @SubscribeEvent
+    public static void registerCommands(RegisterCommandsEvent event) {
+        AdminCommands.register(event.getDispatcher());
     }
 }
