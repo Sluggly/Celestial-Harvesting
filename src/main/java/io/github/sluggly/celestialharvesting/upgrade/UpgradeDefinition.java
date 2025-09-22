@@ -25,7 +25,8 @@ public record UpgradeDefinition(
         Optional<Integer> loot_rerolls,
         Optional<Integer> solar_generation,
         Optional<Integer> mission_bonus,
-        Optional<Integer> inventory_rows
+        Optional<Integer> inventory_rows,
+        Optional<Integer> energy_capacity_bonus
 ) {
     public static final Codec<UpgradeDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("name").forGetter(UpgradeDefinition::name),
@@ -42,6 +43,7 @@ public record UpgradeDefinition(
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("loot_rerolls").forGetter(UpgradeDefinition::loot_rerolls),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("solar_generation").forGetter(UpgradeDefinition::solar_generation),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("mission_bonus").forGetter(UpgradeDefinition::mission_bonus),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("inventory_rows").forGetter(UpgradeDefinition::inventory_rows)
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("inventory_rows").forGetter(UpgradeDefinition::inventory_rows),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("energy_capacity_bonus").forGetter(UpgradeDefinition::energy_capacity_bonus)
     ).apply(instance, UpgradeDefinition::new));
 }

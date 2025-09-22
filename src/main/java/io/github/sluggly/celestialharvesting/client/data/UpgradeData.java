@@ -107,6 +107,12 @@ public class UpgradeData {
                         .withStyle(Style.EMPTY.withColor(0x5555FF)));
             });
 
+            info.def.energy_capacity_bonus().ifPresent(bonus -> {
+                textLines.add(Component.literal(""));
+                textLines.add(Component.literal("+" + bonus + " FE Max Energy")
+                        .withStyle(Style.EMPTY.withColor(0xFFFF55)));
+            });
+
             if (info.isUnlocked) {
                 textLines.add(Component.literal(""));
                 textLines.add(Component.literal("INSTALLED!").withStyle(Style.EMPTY.withColor(0x55FF55)));

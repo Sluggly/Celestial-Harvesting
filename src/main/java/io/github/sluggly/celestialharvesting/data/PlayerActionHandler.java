@@ -99,6 +99,10 @@ public class PlayerActionHandler {
 
                         def.inventory_rows().ifPresent(harvester::applyInventoryUpgrade);
 
+                        if (def.energy_capacity_bonus().isPresent()) {
+                            harvester.recalculateEnergyStorage(harvester.getEnergyStored());
+                        }
+
                         harvester.getHarvesterData().addUpgrade(upgradeId);
                         harvester.setChanged();
 

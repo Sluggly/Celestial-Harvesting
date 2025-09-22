@@ -1,0 +1,19 @@
+{
+  "name": "I-Grade Capacitor",
+  "row": 1,
+  "column": 3,
+  "description": "Adds a basic capacitor bank, increasing the Harvester's maximum energy storage.",
+  "icon": "minecraft:copper_block",
+  "cost": [
+    {
+      "item": "minecraft:redstone_block",
+      "count": 4
+    },
+    {
+      "item": "minecraft:raw_iron_block",
+      "count": 2
+    }
+  ],
+  "requirements": [],
+  "energy_capacity_bonus": 10000
+}

@@ -1,0 +1,22 @@
+{
+  "name": "II-Grade Battery Array",
+  "row": 2,
+  "column": 3,
+  "description": "A dedicated battery array that provides a significant boost to energy capacity.",
+  "icon": "minecraft:gold_block",
+  "cost": [
+    {
+      "item": "minecraft:amethyst_shard",
+      "count": 8
+    },
+    {
+      "item": "minecraft:raw_gold_block",
+      "count": 4
+    }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_2_drive",
+    "celestialharvesting:energy_upgrade_1"
+  ],
+  "energy_capacity_bonus": 20000
+}

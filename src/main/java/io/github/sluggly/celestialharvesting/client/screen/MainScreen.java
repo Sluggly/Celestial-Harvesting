@@ -58,7 +58,7 @@ public class MainScreen extends Screen {
                             data.putLong(NBTKeys.BLOCK_POS, this.harvester.getBlockPos().asLong());
                             PacketHandler.sendToServer(new CtoSPacket(NBTKeys.ACTION_REPAIR_HARVESTER, data));
                         })
-                .bounds(buttonX + 90, buttonY, 50, 20).build());
+                .bounds(buttonX, buttonY, 80, 20).build());
     }
 
     @Override

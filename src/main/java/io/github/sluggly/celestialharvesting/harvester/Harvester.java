@@ -5,6 +5,8 @@ import io.github.sluggly.celestialharvesting.client.screen.HarvesterMenu;
 import io.github.sluggly.celestialharvesting.init.BlockEntityInit;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeDefinition;
+import io.github.sluggly.celestialharvesting.upgrade.UpgradeManager;
 import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,7 +38,9 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class Harvester extends BlockEntity implements MenuProvider {
     private HarvesterData harvesterData = new HarvesterData(null);
@@ -47,22 +51,14 @@ public class Harvester extends BlockEntity implements MenuProvider {
 
     private final Random random = new Random();
 
-    private final EnergyStorage energyStorage = new EnergyStorage(20000, 512, 0) {
-        @Override
-        public int receiveEnergy(int maxReceive, boolean simulate) {
-            int received = super.receiveEnergy(maxReceive, simulate);
-            if (received > 0 && !simulate) {
-                setChanged();
-                if(level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
-            }
-            return received;
-        }
-    };
+    public static final int BASE_ENERGY_CAPACITY = 20000;
+    private EnergyStorage energyStorage; // No longer final
     private LazyOptional<IEnergyStorage> lazyEnergyHandler = LazyOptional.empty();
 
     public Harvester(BlockPos pPos, BlockState pBlockState) {
         super(BlockEntityInit.HARVESTER.get(), pPos, pBlockState);
         this.itemHandler = createItemHandler(1);
+        this.recalculateEnergyStorage(0);
     }
 
     private ItemStackHandler createItemHandler(int rows) {
@@ -72,6 +68,40 @@ public class Harvester extends BlockEntity implements MenuProvider {
             @Override
             public boolean isItemValid(int slot, @NotNull ItemStack stack) { return isInternalModification; }
         };
+    }
+
+    public void recalculateEnergyStorage(int currentEnergy) {
+        int newCapacity = BASE_ENERGY_CAPACITY;
+
+        // Loop through all unlocked upgrades and SUM the bonuses
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+        for (ResourceLocation upgradeId : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(upgradeId);
+            if (def != null && def.energy_capacity_bonus().isPresent()) {
+                newCapacity += def.energy_capacity_bonus().get();
+            }
+        }
+
+        // Create the new storage object
+        this.energyStorage = new EnergyStorage(newCapacity, 512, 0) {
+            @Override
+            public int receiveEnergy(int maxReceive, boolean simulate) {
+                int received = super.receiveEnergy(maxReceive, simulate);
+                if (received > 0 && !simulate) {
+                    setChanged();
+                    if(level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
+                }
+                return received;
+            }
+        };
+
+        // Set the energy to the previous amount, capped by the new capacity
+        this.energyStorage.receiveEnergy(currentEnergy, false);
+
+        // Invalidate the capability so other mods see the change
+        this.lazyEnergyHandler.invalidate();
+        this.lazyEnergyHandler = LazyOptional.of(() -> this.energyStorage);
     }
 
     @Override
@@ -174,6 +204,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
         if (pTag.contains("HarvesterData")) { this.harvesterData = new HarvesterData(pTag.getCompound("HarvesterData")); }
         this.itemHandler = createItemHandler(this.harvesterData.getInventoryRows());
         if (pTag.contains("inventory")) { itemHandler.deserializeNBT(pTag.getCompound("inventory")); }
+        recalculateEnergyStorage(0);
         if (pTag.contains("energy", Tag.TAG_INT)) { energyStorage.deserializeNBT(pTag.get("energy")); }
         if (pTag.contains("animationState")) { animationState = AnimationState.values()[pTag.getInt("animationState")]; }
         if (pTag.contains("animationTick")) { animationTick = pTag.getInt("animationTick"); }
