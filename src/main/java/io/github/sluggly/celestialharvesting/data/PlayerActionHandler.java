@@ -64,7 +64,7 @@ public class PlayerActionHandler {
                     if (be instanceof Harvester harvester) {
                         Mission mission = Mission.getMissionFromId(missionId);
                         if (mission == null) return;
-                        harvester.startMissionSequence(mission);
+                        harvester.startMissionSequence(mission, player);
                     }
                 }
             }
