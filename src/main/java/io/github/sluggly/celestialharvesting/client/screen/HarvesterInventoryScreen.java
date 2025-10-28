@@ -1,6 +1,5 @@
 package io.github.sluggly.celestialharvesting.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.sluggly.celestialharvesting.CelestialHarvesting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -15,16 +14,28 @@ public class HarvesterInventoryScreen extends AbstractContainerScreen<HarvesterI
     public HarvesterInventoryScreen(HarvesterInventoryMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.imageWidth = 176;
-        this.imageHeight = 222;
-        this.inventoryLabelY = this.imageHeight - 94;
+
+        int harvesterRows = pMenu.getHarvesterRows();
+        this.imageHeight = (17 + harvesterRows * 18) + 14 + 94;
+        this.inventoryLabelY = this.imageHeight - 104;
     }
 
+    private static final int TEX_W = 176;
+    private static final int TEX_H = 222;
+    private static final int PLAYER_INV_H = 96;
+
     @Override
-    protected void renderBg(@NotNull GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-        RenderSystem.setShaderTexture(0, TEXTURE);
+    protected void renderBg(@NotNull GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
-        pGuiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+
+        int rows = this.menu.getHarvesterRows();
+        int harvesterSectionHeight = 17 + rows * 18;
+
+        g.blit(TEXTURE, x, y, 0, 0, this.imageWidth, harvesterSectionHeight, TEX_W, TEX_H);
+
+        int vPlayerStart = TEX_H - PLAYER_INV_H;
+        g.blit(TEXTURE, x, y + harvesterSectionHeight, 0, vPlayerStart, this.imageWidth, PLAYER_INV_H, TEX_W, TEX_H);
     }
 
     @Override

@@ -14,27 +14,31 @@ import org.jetbrains.annotations.NotNull;
 
 public class HarvesterInventoryMenu extends AbstractContainerMenu {
     public final Harvester blockEntity;
+    private final int harvesterRows;
 
     public HarvesterInventoryMenu(int pContainerId, Inventory pPlayerInventory, Harvester pBlockEntity) {
         super(MenuInit.HARVESTER_INVENTORY_MENU.get(), pContainerId);
         this.blockEntity = pBlockEntity;
+        this.harvesterRows = pBlockEntity.getHarvesterData().getInventoryRows();
 
-        int harvesterRows = this.blockEntity.getHarvesterData().getInventoryRows();
-
-        for (int i = 0; i < harvesterRows; ++i) {
+        // Harvester Inventory Slots (dynamic rows)
+        for (int i = 0; i < this.harvesterRows; ++i) {
             for (int j = 0; j < 9; ++j) {
                 this.addSlot(new SlotItemHandler(this.blockEntity.getItemHandler(), j + i * 9, 8 + j * 18, 18 + i * 18));
             }
         }
 
-        int playerInventoryY = 18 + harvesterRows * 18 + 14;
+        // Dynamically calculate the Y position for the player's inventory based on the harvester's rows.
+        int playerInventoryY = 18 + this.harvesterRows * 18 + 14;
 
+        // Player Inventory
         for (int i = 0; i < 3; ++i) {
             for (int l = 0; l < 9; ++l) {
                 this.addSlot(new Slot(pPlayerInventory, l + i * 9 + 9, 8 + l * 18, playerInventoryY + i * 18));
             }
         }
 
+        // Player Hotbar
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(pPlayerInventory, i, 8 + i * 18, playerInventoryY + 58));
         }
@@ -43,6 +47,8 @@ public class HarvesterInventoryMenu extends AbstractContainerMenu {
     public HarvesterInventoryMenu(int pContainerId, Inventory pPlayerInventory, FriendlyByteBuf pExtraData) {
         this(pContainerId, pPlayerInventory, getBlockEntity(pPlayerInventory, pExtraData));
     }
+
+    public int getHarvesterRows() { return this.harvesterRows; }
 
     private static Harvester getBlockEntity(final Inventory playerInventory, final FriendlyByteBuf data) {
         final BlockEntity blockEntity = playerInventory.player.level().getBlockEntity(data.readBlockPos());
