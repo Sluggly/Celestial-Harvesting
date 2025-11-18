@@ -59,6 +59,11 @@ public class MainScreen extends Screen {
                             PacketHandler.sendToServer(new CtoSPacket(NBTKeys.ACTION_REPAIR_HARVESTER, data));
                         })
                 .bounds(buttonX, buttonY, 80, 20).build());
+
+        Button automationButton = addRenderableWidget(Button.builder(Component.literal("Automation"),
+                        (button) -> this.minecraft.setScreen(new AutomationScreen(this.harvester, this)))
+                .bounds(buttonX + 90, buttonY - 40, 80, 20).build());
+        if (harvester.getAutomationTier() == 0) { automationButton.active = false; }
     }
 
     @Override

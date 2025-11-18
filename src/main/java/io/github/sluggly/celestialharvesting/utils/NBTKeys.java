@@ -16,6 +16,15 @@ public class NBTKeys {
     public static final String HARVESTER_AVAILABLE_MISSIONS = "AvailableMissions";
     public static final String HARVESTER_INVENTORY_ROWS = "InventoryRows";
 
+    public static final String HARVESTER_AUTOMATION_ON = "AutomationOn";
+    public static final String HARVESTER_AUTOMATION_INTERVAL = "AutomationInterval";
+    public static final String HARVESTER_AUTOMATION_TIMER = "AutomationTimer";
+    public static final String HARVESTER_AUTOMATION_MODE = "AutomationMode";
+    public static final String HARVESTER_AUTOMATION_PRIORITIES = "AutomationPriorities";
+    public static final String HARVESTER_AUTOMATION_TARGET = "AutomationTarget";
+
+    public static final String ACTION_SET_AUTOMATION_CONFIG = "SetAutomationConfig";
+
     // Packet Action
     public static final String ACTION_OPEN_HARVESTER_SCREEN = "OpenHarvesterScreen";
     public static final String ACTION_REFRESH_DATA = "RefreshData";

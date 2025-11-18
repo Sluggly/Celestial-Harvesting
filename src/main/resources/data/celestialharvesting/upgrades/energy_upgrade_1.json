@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "energy_capacity_bonus": 10000
+  }
 }

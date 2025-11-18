@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
@@ -30,9 +31,35 @@ public class HarvesterData {
             this.dataTag.putString(HARVESTER_ACTIVE_MISSION_ID, "");
             this.dataTag.putInt(HARVESTER_INVENTORY_ROWS, 1);
             this.dataTag.put(HARVESTER_UPGRADES, new ListTag());
+
+            this.dataTag.putBoolean(HARVESTER_AUTOMATION_ON, false);
+            this.dataTag.putInt(HARVESTER_AUTOMATION_INTERVAL, 100); // 5 seconds (5*20 ticks)
+            this.dataTag.putInt(HARVESTER_AUTOMATION_TIMER, 100);
+            this.dataTag.putString(HARVESTER_AUTOMATION_MODE, "RANDOM");
+            this.dataTag.put(HARVESTER_AUTOMATION_PRIORITIES, new ListTag());
+            this.dataTag.putString(HARVESTER_AUTOMATION_TARGET, "");
+
             rerollMissions();
         }
         else { this.dataTag = tag; }
+    }
+
+    public enum AutomationPriority {
+        RANDOM,
+        LOWEST_TRAVEL_TIME,
+        HIGHEST_TRAVEL_TIME,
+        LOWEST_TIER,
+        HIGHEST_TIER;
+
+        public Component getDisplayName() {
+            return switch (this) {
+                case RANDOM -> Component.literal("Random");
+                case LOWEST_TRAVEL_TIME -> Component.literal("Fastest Mission");
+                case HIGHEST_TRAVEL_TIME -> Component.literal("Slowest Mission");
+                case LOWEST_TIER -> Component.literal("Lowest Tier");
+                case HIGHEST_TIER -> Component.literal("Highest Tier");
+            };
+        }
     }
 
     public int getCurrentHealth() { return this.dataTag.getInt(HARVESTER_CURRENT_HEALTH); }
@@ -146,8 +173,8 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = UpgradeManager.getInstance().getAllUpgrades().get(upgradeId);
-            if (def != null && def.speed_modifier().isPresent()) {
-                if (def.speed_modifier().get() < bestModifier) { bestModifier = def.speed_modifier().get(); }
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().speed_modifier().isPresent()) {
+                if (def.bonuses().get().speed_modifier().get() < bestModifier) { bestModifier = def.bonuses().get().speed_modifier().get(); }
             }
         }
 
@@ -162,8 +189,8 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.fuel_modifier().isPresent()) {
-                if (def.fuel_modifier().get() < bestModifier) { bestModifier = def.fuel_modifier().get(); }
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().fuel_modifier().isPresent()) {
+                if (def.bonuses().get().fuel_modifier().get() < bestModifier) { bestModifier = def.bonuses().get().fuel_modifier().get(); }
             }
         }
 
@@ -178,9 +205,9 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.damage_negation_chance().isPresent()) {
-                if (def.damage_negation_chance().get() > bestChance) {
-                    bestChance = def.damage_negation_chance().get();
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().damage_negation_chance().isPresent()) {
+                if (def.bonuses().get().damage_negation_chance().get() > bestChance) {
+                    bestChance = def.bonuses().get().damage_negation_chance().get();
                 }
             }
         }
@@ -195,8 +222,8 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.loot_rerolls().isPresent()) {
-                if (def.loot_rerolls().get() > bestRerolls) { bestRerolls = def.loot_rerolls().get(); }
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().loot_rerolls().isPresent()) {
+                if (def.bonuses().get().loot_rerolls().get() > bestRerolls) { bestRerolls = def.bonuses().get().loot_rerolls().get(); }
             }
         }
         return bestRerolls;
@@ -210,8 +237,8 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.solar_generation().isPresent()) {
-                if (def.solar_generation().get() > bestRate) { bestRate = def.solar_generation().get(); }
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().solar_generation().isPresent()) {
+                if (def.bonuses().get().solar_generation().get() > bestRate) { bestRate = def.bonuses().get().solar_generation().get(); }
             }
         }
         return bestRate;
@@ -225,11 +252,39 @@ public class HarvesterData {
 
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.mission_bonus().isPresent()) {
-                if (def.mission_bonus().get() > bestBonus) { bestBonus = def.mission_bonus().get(); }
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().mission_bonus().isPresent()) {
+                if (def.bonuses().get().mission_bonus().get() > bestBonus) { bestBonus = def.bonuses().get().mission_bonus().get(); }
             }
         }
         return bestBonus;
+    }
+
+    public boolean isAutomationOn() { return this.dataTag.getBoolean(HARVESTER_AUTOMATION_ON); }
+    public void setAutomationOn(boolean on) { this.dataTag.putBoolean(HARVESTER_AUTOMATION_ON, on); }
+
+    public int getAutomationInterval() { return this.dataTag.getInt(HARVESTER_AUTOMATION_INTERVAL); }
+    public void setAutomationInterval(int ticks) { this.dataTag.putInt(HARVESTER_AUTOMATION_INTERVAL, ticks); }
+
+    public int getAutomationTimer() { return this.dataTag.getInt(HARVESTER_AUTOMATION_TIMER); }
+    public void setAutomationTimer(int ticks) { this.dataTag.putInt(HARVESTER_AUTOMATION_TIMER, ticks); }
+
+    // You will need an enum for this. Let's add it inside HarvesterData.
+    public enum AutomationMode { RANDOM, PRIORITY, TARGETED }
+    public AutomationMode getAutomationMode() {
+        try { return AutomationMode.valueOf(this.dataTag.getString(HARVESTER_AUTOMATION_MODE)); }
+        catch (IllegalArgumentException e) { return AutomationMode.RANDOM; }
+    }
+    public void setAutomationMode(AutomationMode mode) { this.dataTag.putString(HARVESTER_AUTOMATION_MODE, mode.name()); }
+
+    public ListTag getAutomationPriorities() { return this.dataTag.getList(HARVESTER_AUTOMATION_PRIORITIES, Tag.TAG_STRING); }
+    public void setAutomationPriorities(ListTag priorities) { this.dataTag.put(HARVESTER_AUTOMATION_PRIORITIES, priorities); }
+
+    public ResourceLocation getAutomationTarget() {
+        String target = this.dataTag.getString(HARVESTER_AUTOMATION_TARGET);
+        return target.isEmpty() ? null : new ResourceLocation(target);
+    }
+    public void setAutomationTarget(ResourceLocation target) {
+        this.dataTag.putString(HARVESTER_AUTOMATION_TARGET, target == null ? "" : target.toString());
     }
 
 }

@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "inventory_rows": 1
+  }
 }

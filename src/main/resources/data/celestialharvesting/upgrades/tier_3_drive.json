@@ -21,5 +21,7 @@
   "requirements": [
     "celestialharvesting:tier_2_drive"
   ],
+  "bonuses": {
   "grantsTier": 3
+  }
 }

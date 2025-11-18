@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "loot_rerolls": 1
+  }
 }

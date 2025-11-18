@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "speed_modifier": 0.9
+  }
 }

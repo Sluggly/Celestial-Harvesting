@@ -18,5 +18,7 @@
     "celestialharvesting:tier_2_drive",
     "celestialharvesting:energy_upgrade_1"
   ],
+  "bonuses": {
   "energy_capacity_bonus": 20000
+  }
 }

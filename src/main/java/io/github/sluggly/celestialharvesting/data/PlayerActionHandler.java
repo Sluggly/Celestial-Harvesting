@@ -4,6 +4,7 @@ import io.github.sluggly.celestialharvesting.admin.Admin;
 import io.github.sluggly.celestialharvesting.client.screen.HarvesterInventoryMenu;
 import io.github.sluggly.celestialharvesting.harvester.Harvester;
 import io.github.sluggly.celestialharvesting.harvester.HarvesterBlock;
+import io.github.sluggly.celestialharvesting.harvester.HarvesterData;
 import io.github.sluggly.celestialharvesting.mission.Mission;
 import io.github.sluggly.celestialharvesting.mission.MissionItem;
 import io.github.sluggly.celestialharvesting.network.CtoSPacket;
@@ -14,6 +15,7 @@ import io.github.sluggly.celestialharvesting.utils.NBTKeys;
 import io.github.sluggly.celestialharvesting.utils.Utils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
@@ -91,16 +93,18 @@ public class PlayerActionHandler {
                             Utils.removeItemInInventory(item.item().asItem(), item.count(), player);
                         }
 
-                        def.grantsTier().ifPresent(newTier -> {
-                            if (newTier > harvester.getHarvesterData().getTier()) {
-                                harvester.getHarvesterData().setTier(newTier);
+                        if (def.bonuses().isPresent()) {
+                            def.bonuses().get().grantsTier().ifPresent(newTier -> {
+                                if (newTier > harvester.getHarvesterData().getTier()) {
+                                    harvester.getHarvesterData().setTier(newTier);
+                                }
+                            });
+
+                            def.bonuses().get().inventory_rows().ifPresent(harvester::applyInventoryUpgrade);
+
+                            if (def.bonuses().get().energy_capacity_bonus().isPresent()) {
+                                harvester.recalculateEnergyStorage(harvester.getEnergyStored());
                             }
-                        });
-
-                        def.inventory_rows().ifPresent(harvester::applyInventoryUpgrade);
-
-                        if (def.energy_capacity_bonus().isPresent()) {
-                            harvester.recalculateEnergyStorage(harvester.getEnergyStored());
                         }
 
                         harvester.getHarvesterData().addUpgrade(upgradeId);
@@ -115,6 +119,27 @@ public class PlayerActionHandler {
                         payload.put("HarvesterData", harvester.getHarvesterData().dataTag);
                         payload.putLong(NBTKeys.BLOCK_POS, pos.asLong());
                         PacketHandler.sendToPlayer(NBTKeys.ACTION_REFRESH_DATA, payload, player);
+                    }
+                }
+            }
+            case NBTKeys.ACTION_SET_AUTOMATION_CONFIG -> {
+                if (data.contains(NBTKeys.BLOCK_POS)) {
+                    BlockPos pos = BlockPos.of(data.getLong(NBTKeys.BLOCK_POS));
+                    BlockEntity be = player.level().getBlockEntity(pos);
+                    if (be instanceof Harvester harvester) {
+                        harvester.getHarvesterData().setAutomationOn(data.getBoolean(NBTKeys.HARVESTER_AUTOMATION_ON));
+                        harvester.getHarvesterData().setAutomationInterval(data.getInt(NBTKeys.HARVESTER_AUTOMATION_INTERVAL));
+                        harvester.getHarvesterData().setAutomationTimer(data.getInt(NBTKeys.HARVESTER_AUTOMATION_INTERVAL)); // Reset timer
+                        harvester.getHarvesterData().setAutomationMode(HarvesterData.AutomationMode.valueOf(data.getString(NBTKeys.HARVESTER_AUTOMATION_MODE)));
+
+                        if (data.contains(NBTKeys.HARVESTER_AUTOMATION_PRIORITIES)) {
+                            harvester.getHarvesterData().setAutomationPriorities(data.getList(NBTKeys.HARVESTER_AUTOMATION_PRIORITIES, Tag.TAG_STRING));
+                        }
+                        if (data.contains(NBTKeys.HARVESTER_AUTOMATION_TARGET)) {
+                            harvester.getHarvesterData().setAutomationTarget(new ResourceLocation(data.getString(NBTKeys.HARVESTER_AUTOMATION_TARGET)));
+                        }
+
+                        harvester.setChanged();
                     }
                 }
             }

@@ -1,0 +1,18 @@
+{
+  "name": "III-Grade Pre-Cognitive Unit",
+  "row": 3,
+  "column": 0,
+  "description": "Unlocks Targeted Automation, allowing the Harvester to repeatedly run a specific mission from its available list.",
+  "icon": "minecraft:sculk_sensor",
+  "cost": [
+    { "item": "minecraft:netherite_ingot", "count": 1 },
+    { "item": "minecraft:echo_shard", "count": 4 }
+  ],
+  "requirements": [
+    "celestialharvesting:tier_3_drive",
+    "celestialharvesting:automation_module_2"
+  ],
+  "bonuses": {
+    "unlocks_automation_tier": 3
+  }
+}

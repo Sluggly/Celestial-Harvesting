@@ -1,0 +1,15 @@
+{
+  "name": "I-Grade Automation Core",
+  "row": 1,
+  "column": 0,
+  "description": "Unlocks the Automation menu, allowing the Harvester to automatically start random missions when idle.",
+  "icon": "minecraft:observer",
+  "cost": [
+    { "item": "minecraft:redstone_block", "count": 4 },
+    { "item": "minecraft:comparator", "count": 8 }
+  ],
+  "requirements": [],
+  "bonuses": {
+    "unlocks_automation_tier": 1
+  }
+}

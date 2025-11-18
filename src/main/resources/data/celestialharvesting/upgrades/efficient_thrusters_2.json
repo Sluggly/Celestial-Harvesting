@@ -18,5 +18,7 @@
     "celestialharvesting:tier_2_drive",
     "celestialharvesting:efficient_thrusters_1"
   ],
+  "bonuses": {
   "fuel_modifier": 0.75
+  }
 }

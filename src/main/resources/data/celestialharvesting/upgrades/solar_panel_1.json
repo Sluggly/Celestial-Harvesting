@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "solar_generation": 1
+  }
 }

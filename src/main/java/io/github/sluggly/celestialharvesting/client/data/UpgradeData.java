@@ -67,51 +67,53 @@ public class UpgradeData {
             textLines.add(Component.literal(info.def.name()).withStyle(Style.EMPTY.withColor(color)));
             textLines.add(Component.literal(info.def.description()).withStyle(Style.EMPTY.withColor(0xAAAAAA)));
 
-            info.def.speed_modifier().ifPresent(modifier -> {
-                int percentage = (int) ((1.0f - modifier) * 100);
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("Reduces mission time by " + percentage + "%")
-                        .withStyle(Style.EMPTY.withColor(0x55FFFF)));
-            });
+            if (info.def.bonuses().isPresent()) {
+                info.def.bonuses().get().speed_modifier().ifPresent(modifier -> {
+                    int percentage = (int) ((1.0f - modifier) * 100);
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("Reduces mission time by " + percentage + "%")
+                            .withStyle(Style.EMPTY.withColor(0x55FFFF)));
+                });
 
-            info.def.fuel_modifier().ifPresent(modifier -> {
-                int percentage = (int) ((1.0f - modifier) * 100);
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("Reduces fuel cost by " + percentage + "%")
-                        .withStyle(Style.EMPTY.withColor(0xFFD700)));
-            });
+                info.def.bonuses().get().fuel_modifier().ifPresent(modifier -> {
+                    int percentage = (int) ((1.0f - modifier) * 100);
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("Reduces fuel cost by " + percentage + "%")
+                            .withStyle(Style.EMPTY.withColor(0xFFD700)));
+                });
 
-            info.def.damage_negation_chance().ifPresent(chance -> {
-                int percentage = (int) (chance * 100);
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal(percentage + "% chance to negate all mission damage")
-                        .withStyle(Style.EMPTY.withColor(0x55FF55)));
-            });
+                info.def.bonuses().get().damage_negation_chance().ifPresent(chance -> {
+                    int percentage = (int) (chance * 100);
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal(percentage + "% chance to negate all mission damage")
+                            .withStyle(Style.EMPTY.withColor(0x55FF55)));
+                });
 
-            info.def.loot_rerolls().ifPresent(rerolls -> {
-                String times = (rerolls == 1) ? "1 extra time" : rerolls + " extra times";
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("Triggers the loot table " + times)
-                        .withStyle(Style.EMPTY.withColor(0xFFD700)));
-            });
+                info.def.bonuses().get().loot_rerolls().ifPresent(rerolls -> {
+                    String times = (rerolls == 1) ? "1 extra time" : rerolls + " extra times";
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("Triggers the loot table " + times)
+                            .withStyle(Style.EMPTY.withColor(0xFFD700)));
+                });
 
-            info.def.solar_generation().ifPresent(rate -> {
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("Passively generates " + rate + " FE per tick")
-                        .withStyle(Style.EMPTY.withColor(0xFFFF55)));
-            });
+                info.def.bonuses().get().solar_generation().ifPresent(rate -> {
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("Passively generates " + rate + " FE per tick")
+                            .withStyle(Style.EMPTY.withColor(0xFFFF55)));
+                });
 
-            info.def.mission_bonus().ifPresent(bonus -> {
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("+" + bonus + " Mission Slots")
-                        .withStyle(Style.EMPTY.withColor(0x5555FF)));
-            });
+                info.def.bonuses().get().mission_bonus().ifPresent(bonus -> {
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("+" + bonus + " Mission Slots")
+                            .withStyle(Style.EMPTY.withColor(0x5555FF)));
+                });
 
-            info.def.energy_capacity_bonus().ifPresent(bonus -> {
-                textLines.add(Component.literal(""));
-                textLines.add(Component.literal("+" + bonus + " FE Max Energy")
-                        .withStyle(Style.EMPTY.withColor(0xFFFF55)));
-            });
+                info.def.bonuses().get().energy_capacity_bonus().ifPresent(bonus -> {
+                    textLines.add(Component.literal(""));
+                    textLines.add(Component.literal("+" + bonus + " FE Max Energy")
+                            .withStyle(Style.EMPTY.withColor(0xFFFF55)));
+                });
+            }
 
             if (info.isUnlocked) {
                 textLines.add(Component.literal(""));

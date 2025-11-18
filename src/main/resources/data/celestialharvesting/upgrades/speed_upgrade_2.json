@@ -18,5 +18,7 @@
     "celestialharvesting:tier_2_drive",
     "celestialharvesting:speed_upgrade_1"
   ],
+  "bonuses": {
   "speed_modifier": 0.75
+  }
 }

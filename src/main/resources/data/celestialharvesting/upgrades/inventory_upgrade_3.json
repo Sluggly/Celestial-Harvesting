@@ -18,5 +18,7 @@
     "celestialharvesting:tier_3_drive",
     "celestialharvesting:inventory_upgrade_2"
   ],
+  "bonuses": {
   "inventory_rows": 3
+  }
 }

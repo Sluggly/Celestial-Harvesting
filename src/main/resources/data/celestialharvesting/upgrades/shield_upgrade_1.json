@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "damage_negation_chance": 0.25
+  }
 }

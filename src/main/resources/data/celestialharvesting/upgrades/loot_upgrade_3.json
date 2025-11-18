@@ -18,5 +18,7 @@
     "celestialharvesting:tier_3_drive",
     "celestialharvesting:loot_upgrade_2"
   ],
+  "bonuses": {
   "loot_rerolls": 3
+  }
 }

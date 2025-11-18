@@ -18,5 +18,7 @@
     "celestialharvesting:tier_2_drive",
     "celestialharvesting:solar_panel_1"
   ],
+  "bonuses": {
   "solar_generation": 4
+  }
 }

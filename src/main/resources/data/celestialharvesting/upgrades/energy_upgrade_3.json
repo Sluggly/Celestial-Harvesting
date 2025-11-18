@@ -18,7 +18,7 @@
     "celestialharvesting:tier_3_drive",
     "celestialharvesting:energy_upgrade_2"
   ],
+  "bonuses": {
   "energy_capacity_bonus": 50000
-}```
-
-This completes the implementation. Your Harvester's energy capacity is now fully dynamic, upgradeable, and persists correctly, seamlessly integrating with the rest of your progression system.
+  }
+}

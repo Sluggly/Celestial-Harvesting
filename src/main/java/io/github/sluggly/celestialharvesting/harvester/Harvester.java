@@ -12,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -38,9 +39,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Harvester extends BlockEntity implements MenuProvider {
     private HarvesterData harvesterData = new HarvesterData(null);
@@ -78,8 +78,8 @@ public class Harvester extends BlockEntity implements MenuProvider {
         Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
         for (ResourceLocation upgradeId : unlockedUpgrades) {
             UpgradeDefinition def = allUpgrades.get(upgradeId);
-            if (def != null && def.energy_capacity_bonus().isPresent()) {
-                newCapacity += def.energy_capacity_bonus().get();
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().energy_capacity_bonus().isPresent()) {
+                newCapacity += def.bonuses().get().energy_capacity_bonus().get();
             }
         }
 
@@ -156,6 +156,18 @@ public class Harvester extends BlockEntity implements MenuProvider {
             else if (timeLeft % 20 == 0) { pBlockEntity.setChanged(); }
         }
         else {
+            // Try to start mission automatically
+            if (pBlockEntity.getHarvesterData().isAutomationOn() && pBlockEntity.getAutomationTier() > 0) {
+                int timer = pBlockEntity.getHarvesterData().getAutomationTimer();
+                timer--;
+                pBlockEntity.getHarvesterData().setAutomationTimer(timer);
+
+                if (timer <= 0) {
+                    pBlockEntity.getHarvesterData().setAutomationTimer(pBlockEntity.getHarvesterData().getAutomationInterval());
+                    pBlockEntity.tryStartAutomatedMission(null);
+                }
+            }
+            // Solar Generation
             int solarRate = pBlockEntity.harvesterData.getSolarGenerationRate();
             if (solarRate > 0) {
                 if (pBlockEntity.energyStorage.getEnergyStored() < pBlockEntity.energyStorage.getMaxEnergyStored()) {
@@ -241,7 +253,7 @@ public class Harvester extends BlockEntity implements MenuProvider {
     public AnimationState getAnimationState() { return this.animationState; }
     public int getAnimationTick() { return this.animationTick; }
 
-    public void startMissionSequence(Mission mission, ServerPlayer player) {
+    public void startMissionSequence(Mission mission, @Nullable ServerPlayer player) {
         if (this.level == null || this.level.isClientSide()) return;
 
         int modifiedFuelCost = this.harvesterData.getModifiedFuelCost(mission.getFuelCost());
@@ -250,7 +262,9 @@ public class Harvester extends BlockEntity implements MenuProvider {
             getHarvesterData().setActiveMissionID(mission.getId().toString());
 
             int missionTime = this.harvesterData.getModifiedMissionTime(mission.getTravelTime());
-            if (Admin.arePlayerMissionsInstant(player)) { missionTime = 3; }
+            if (player != null) {
+                if (Admin.arePlayerMissionsInstant(player)) { missionTime = 3; }
+            }
 
             getHarvesterData().setMissionTimeLeft(missionTime);
 
@@ -315,8 +329,11 @@ public class Harvester extends BlockEntity implements MenuProvider {
         this.harvesterData.setActiveMissionID("");
         this.harvesterData.setMissionTimeLeft(0);
 
+        if (this.getAutomationTier() < 3 || this.harvesterData.getAutomationMode() != HarvesterData.AutomationMode.TARGETED) {
+            this.harvesterData.rerollMissions();
+        }
+
         this.harvesterData.generateSeed();
-        this.harvesterData.rerollMissions();
 
         setChanged();
         if (level != null) { level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3); }
@@ -378,6 +395,87 @@ public class Harvester extends BlockEntity implements MenuProvider {
         this.lazyItemHandler = LazyOptional.of(() -> this.itemHandler);
 
         setChanged();
+    }
+
+    public int getAutomationTier() {
+        int bestTier = 0;
+        Set<ResourceLocation> unlockedUpgrades = this.harvesterData.getUnlockedUpgrades();
+        Map<ResourceLocation, UpgradeDefinition> allUpgrades = UpgradeManager.getInstance().getAllUpgrades();
+        for (ResourceLocation id : unlockedUpgrades) {
+            UpgradeDefinition def = allUpgrades.get(id);
+            if (def != null && def.bonuses().isPresent() && def.bonuses().get().unlocks_automation_tier().isPresent()) {
+                if (def.bonuses().get().unlocks_automation_tier().get() > bestTier) {
+                    bestTier = def.bonuses().get().unlocks_automation_tier().get();
+                }
+            }
+        }
+        return bestTier;
+    }
+
+    private void tryStartAutomatedMission(@Nullable ServerPlayer player) {
+        List<ResourceLocation> availableMissionsIds = this.harvesterData.getAvailableMissions();
+        if (availableMissionsIds.isEmpty()) return;
+
+        Mission selectedMission = null;
+        HarvesterData.AutomationMode mode = this.harvesterData.getAutomationMode();
+        int automationTier = this.getAutomationTier();
+
+        // Convert to a list of valid, launchable missions first (has tier, has fuel)
+        List<Mission> launchableMissions = availableMissionsIds.stream()
+                .map(Mission::getMissionFromId)
+                .filter(Objects::nonNull)
+                .filter(m -> this.getHarvesterData().getTier() >= m.getRequiredTier())
+                .filter(m -> this.getEnergyStored() >= this.getHarvesterData().getModifiedFuelCost(m.getFuelCost()))
+                .toList();
+
+        if (launchableMissions.isEmpty()) return; // No launchable missions
+
+        // --- TIER 3: TARGETED MODE ---
+        if (automationTier >= 3 && mode == HarvesterData.AutomationMode.TARGETED) {
+            ResourceLocation targetId = this.harvesterData.getAutomationTarget();
+            if (targetId != null) {
+                selectedMission = launchableMissions.stream()
+                        .filter(m -> m.getId().equals(targetId))
+                        .findFirst().orElse(null);
+            }
+        }
+
+        // --- TIER 2: PRIORITY MODE ---
+        if (selectedMission == null && automationTier >= 2 && mode == HarvesterData.AutomationMode.PRIORITY) {
+            ListTag priorities = this.harvesterData.getAutomationPriorities();
+            List<Mission> candidates = new ArrayList<>(launchableMissions);
+
+            for (Tag tag : priorities) {
+                HarvesterData.AutomationPriority p = HarvesterData.AutomationPriority.valueOf(tag.getAsString());
+                Comparator<Mission> comparator = null;
+                switch (p) {
+                    case LOWEST_TRAVEL_TIME -> comparator = Comparator.comparingInt(Mission::getTravelTime);
+                    case HIGHEST_TRAVEL_TIME -> comparator = Comparator.comparingInt(Mission::getTravelTime).reversed();
+                    case LOWEST_TIER -> comparator = Comparator.comparingInt(Mission::getRequiredTier);
+                    case HIGHEST_TIER -> comparator = Comparator.comparingInt(Mission::getRequiredTier).reversed();
+                }
+                if (comparator != null && !candidates.isEmpty()) {
+                    // Find the best value according to the comparator
+                    Mission best = candidates.stream().min(comparator).get();
+                    // Filter the list to only include missions that are equally as good
+                    Comparator<Mission> finalComparator = comparator;
+                    candidates.removeIf(m -> finalComparator.compare(m, best) > 0);
+                }
+            }
+            if (!candidates.isEmpty()) {
+                selectedMission = candidates.get(this.random.nextInt(candidates.size()));
+            }
+        }
+
+        // --- TIER 1: RANDOM MODE (FALLBACK) ---
+        if (selectedMission == null && automationTier >= 1) {
+            selectedMission = launchableMissions.get(this.random.nextInt(launchableMissions.size()));
+        }
+
+        // Launch the selected mission if one was found
+        if (selectedMission != null) {
+            this.startMissionSequence(selectedMission, player);
+        }
     }
 
 

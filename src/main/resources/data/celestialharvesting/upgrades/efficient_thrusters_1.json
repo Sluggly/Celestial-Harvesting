@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
+  "bonuses": {
   "fuel_modifier": 0.9
+  }
 }

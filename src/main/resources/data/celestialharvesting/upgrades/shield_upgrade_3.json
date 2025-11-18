@@ -18,5 +18,7 @@
     "celestialharvesting:tier_3_drive",
     "celestialharvesting:shield_upgrade_2"
   ],
+  "bonuses": {
   "damage_negation_chance": 1.0
+  }
 }

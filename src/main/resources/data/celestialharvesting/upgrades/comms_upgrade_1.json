@@ -15,5 +15,7 @@
     }
   ],
   "requirements": [],
-  "mission_bonus": 1
+  "bonuses": {
+	"mission_bonus": 1
+  }
 }

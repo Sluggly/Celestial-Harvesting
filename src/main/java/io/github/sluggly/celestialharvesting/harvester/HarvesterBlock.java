@@ -75,7 +75,15 @@ public class HarvesterBlock extends BaseEntityBlock {
         if (!pLevel.isClientSide()) {
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if (entity instanceof Harvester harvester) {
-                if (harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_ONGOING)) {
+                if (pPlayer.isShiftKeyDown() && harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_ONGOING)) {
+                    if (harvester.getHarvesterData().isAutomationOn()) {
+                        harvester.getHarvesterData().setAutomationOn(false);
+                        pPlayer.sendSystemMessage(Component.literal("Harvester automation disabled."));
+                        harvester.setChanged();
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+                else if (harvester.getHarvesterData().getStatus().equals(NBTKeys.HARVESTER_ONGOING)) {
                     pPlayer.sendSystemMessage(Component.literal("Harvester is currently on a mission."));
                     return InteractionResult.SUCCESS;
                 }
